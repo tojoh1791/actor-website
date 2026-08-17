@@ -4,8 +4,9 @@ REST API and server-side application.
 
 Planned stack:
 
-- Java 21
-- Spring boot
-- Spring Security
-- Spring Data JPA
+- C#
+- ASP.NET Core
+- Entity Framework Core
 - PostgreSQL
+
+The backend will be responsible for authentication, atuhorization, validation, event management and database access.

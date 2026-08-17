@@ -3,14 +3,9 @@
 .env.*
 !.env.example
 
-# Node / Next.js
+# Node / React
 node_modules/
-.next/
-out/
-
-# Java / Spring Boot
-target/
-*.class
+dist/
 
 # IDE
 .vscode/
