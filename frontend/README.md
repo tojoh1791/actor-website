@@ -1,6 +1,6 @@
 # Frontend
 
-React og TypeScript med Vite og React Router. Offentlige ruter: /, /about, /events og /contact. /admin og /admin/login er foreløpig plassholdere.
+React og TypeScript med Vite og React Router. Offentlige ruter: /, /about, /talks, /book, /events og /contact. /admin og /admin/login er foreløpig plassholdere.
 
 Fra prosjektroten:
 
@@ -11,3 +11,5 @@ Fra prosjektroten:
 Utviklingsserveren bruker http://localhost:5173 og videresender /api til http://localhost:5080. Se README.md i prosjektroten for database og backend.
 
 Arrangementslisten har lasting, feil- og tomtilstand. Detaljene bruker HTML details/summary for innebygd tastaturstøtte. Datoer vises i Europe/Oslo.
+
+Innhold og fremtidig kontakt/booking konfigureres i src/content/site.ts. Bildefiler ligger i public/images. Kilder og bildeopplysninger er dokumentert i docs/content-sources.md i prosjektroten.

@@ -6,7 +6,7 @@ Nettside for en skuespiller, med kommende arrangementer og planlagt administrasj
 
 Prosjektgrunnlaget er satt opp. Frontend har offentlige sider og henter kommende arrangementer fra API-et. Backend har PostgreSQL-tilkobling, arrangementsmodell, Identity-datamodell og første databasemigrering.
 
-Innlogging, administratoropprettelse og oppretting/redigering/sletting/publisering av arrangementer er **ikke implementert ennå**. Presentasjonstekstene er plassholdere. Ingen demoarrangementer eller brukere opprettes automatisk.
+Innlogging, administratoropprettelse og oppretting/redigering/sletting/publisering av arrangementer er **ikke implementert ennå**. Nettsiden har kildebasert informasjon om Arben Bala, foredraget Uten frykt og romanen Balkanbrødre, med portrett og bokomslag. Kontakt- og bookingkanal er ikke valgt ennå. Ingen demoarrangementer eller brukere opprettes automatisk.
 
 ## Teknologi
 

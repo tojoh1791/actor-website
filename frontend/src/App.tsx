@@ -1,42 +1,55 @@
-import { Link, NavLink, Route, Routes } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import BookingLink from './components/BookingLink'
+import HomePage from './pages/HomePage'
+import AboutPage from './pages/AboutPage'
+import TalksPage from './pages/TalksPage'
+import BookPage from './pages/BookPage'
+import ContactPage from './pages/ContactPage'
 import EventsPage from './pages/EventsPage'
 
-function HomePage() {
-  return <section className="hero">
-    <p className="eyebrow">Skuespill · Foredrag · Fortellinger</p>
-    <h1>Historier som<br />skaper møter.</h1>
-    <p>En plass for scenekunst, livshistorier og samtaler med publikum.</p>
-    <Link className="button" to="/events">Se kommende arrangementer</Link>
-  </section>
+const pageTitles: Record<string, string> = {
+  '/': 'Arben Bala | Skuespiller og foredragsholder',
+  '/about': 'Om Arben | Arben Bala',
+  '/talks': 'Uten frykt – foredrag | Arben Bala',
+  '/book': 'Balkanbrødre | Arben Bala',
+  '/events': 'Kommende arrangementer | Arben Bala',
+  '/contact': 'Kontakt og booking | Arben Bala',
+  '/admin': 'Administrasjon | Arben Bala',
+  '/admin/login': 'Innlogging | Arben Bala',
 }
 
-function AboutPage() {
-  return <section><p className="eyebrow">Bak historiene</p><h1>Om skuespilleren</h1><p>Biografi, skuespillerbakgrunn og historien bak boken kommer her.</p></section>
-}
-
-function ContactPage() {
-  return <section><p className="eyebrow">La oss møtes</p><h1>Kontakt og booking</h1><p>Kontaktinformasjon for foredrag, forestillinger og samarbeid legges til når innholdet er avklart.</p></section>
+function PageNavigation() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    document.title = pageTitles[pathname] ?? 'Siden finnes ikke | Arben Bala'
+    window.scrollTo({ top: 0, behavior: 'instant' })
+    // Move focus after route changes so keyboard users reach the new content.
+    document.getElementById('main')?.focus({ preventScroll: true })
+  }, [pathname])
+  return null
 }
 
 function AdminPage() {
-  return <section><h1>Administrasjon</h1><p>Innlogging og administrasjon av arrangementer utvikles i neste steg.</p></section>
+  return <section className="page-heading"><p className="eyebrow">Administrasjon</p><h1>Administrasjon</h1><p>Innlogging og administrasjon av arrangementer utvikles i neste steg.</p></section>
 }
 
 export default function App() {
   return <>
+    <PageNavigation />
     <a className="skip-link" href="#main">Hopp til innhold</a>
-    <header className="site-header"><Link className="brand" to="/">Skuespiller</Link><nav aria-label="Hovedmeny">
-      <NavLink to="/" end>Hjem</NavLink><NavLink to="/about">Om</NavLink><NavLink to="/events">Arrangementer</NavLink><NavLink to="/contact">Kontakt</NavLink>
-    </nav></header>
+    <header className="site-header"><Link className="brand" to="/" aria-label="Arben Bala – forsiden">Arben Bala<span className="brand-dot">.</span></Link><nav aria-label="Hovedmeny"><NavLink to="/about">Om Arben</NavLink><NavLink to="/talks">Foredrag</NavLink><NavLink to="/book">Boken</NavLink><NavLink to="/events">Arrangementer</NavLink><NavLink className="nav-contact" to="/contact">Kontakt og booking <span aria-hidden="true">↗</span></NavLink></nav></header>
     <main id="main" tabIndex={-1}><Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route path="/talks" element={<TalksPage />} />
+      <Route path="/book" element={<BookPage />} />
       <Route path="/events" element={<EventsPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/admin/login" element={<AdminPage />} />
-      <Route path="*" element={<section><h1>Siden finnes ikke</h1><Link to="/">Til forsiden</Link></section>} />
+      <Route path="*" element={<section className="page-heading"><h1>Siden finnes ikke</h1><Link to="/">Til forsiden</Link></section>} />
     </Routes></main>
-    <footer>Skuespill · Foredrag · Fortellinger</footer>
+    <footer className="site-footer"><div><Link className="brand" to="/">Arben Bala<span className="brand-dot">.</span></Link><p>Skuespiller og foredragsholder</p></div><div className="footer-links"><Link to="/events">Arrangementer</Link><BookingLink className="text-link" /></div><p className="footer-credit">Portrett: Are Næsset</p></footer>
   </>
 }
