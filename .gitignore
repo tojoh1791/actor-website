@@ -17,3 +17,19 @@ Thumbs.db
 
 # Logs
 *.log
+# .NET
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+
+# Local caches and test results
+.nuget/
+.dotnet/
+TestResults/
+coverage/
+playwright-report/
+
+# Development data-protection keys
+**/.data/

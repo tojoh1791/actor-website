@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:5080
+
+GET {{baseUrl}}/api/health
+Accept: application/json
+
+### Database and schema readiness
+GET {{baseUrl}}/api/health/ready
+
+### Published upcoming events
+GET {{baseUrl}}/api/events
+Accept: application/json
+
+### OpenAPI (development only)
+GET {{baseUrl}}/openapi/v1.json

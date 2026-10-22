@@ -1,0 +1,20 @@
+{
+  "name": "actor-website",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "init:local": "node scripts/init-local.mjs",
+    "dev:web": "npm --prefix frontend run dev",
+    "dev:api": "node --env-file=.env scripts/dotnet.mjs run --project backend/ActorWebsite.Api --launch-profile http",
+    "db:up": "docker compose up -d --wait db",
+    "db:stop": "docker compose stop db",
+    "db:migrate": "node --env-file=.env scripts/dotnet.mjs ef database update --project backend/ActorWebsite.Api",
+    "tools:restore": "dotnet tool restore",
+    "build:web": "npm --prefix frontend run build",
+    "build:api": "dotnet build ActorWebsite.slnx",
+    "check": "npm run build:web && npm run build:api"
+  }
+}

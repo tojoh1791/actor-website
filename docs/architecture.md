@@ -4,7 +4,7 @@
 
 React-based frontend application using TypeScript
 
-The excact React framework and build setup has not yet been decided. Possible options include a standard React setup or Next.js
+The frontend uses Vite with React, TypeScript and React Router. See development.md for implementation status.
 
 The frontend contains:
 
