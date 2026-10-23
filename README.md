@@ -114,6 +114,10 @@ Frontend bruker React-komponenter og hooks. Backend bruker Minimal API med egne 
 
 ## Demonstrasjon til innleveringen
 
+Kjør **npm run demo:seed** for å legge inn syv fiktive arrangementer og åtte bookingforespørsler i den lokale utviklingsdatabasen. Fem arrangementer vises offentlig; ett er tidligere og ett er et utkast. Datoene beregnes fra dagen kommandoen kjøres første gang. Kommandoen beholder eksisterende innhold og endringer og legger ikke inn duplikater ved gjentatt kjøring. Den kan bare kjøres i Development-miljøet.
+
+Se [demodata og kopierbare bookingeksempler](docs/demodata.md) for ferdig innhold til skjemaene og forslag til demonstrasjon. Alle demoarrangementer er fiktive og merket som demo.
+
 1. Send en bookingforespørsel fra /contact.
 2. Logg inn på /admin, åpne forespørselen og lagre statusen «Avtalt».
 3. Velg «Opprett arrangement fra forespørselen». Fyll inn klokkeslett og adresse, kontroller dato og tekst, og velg eventuelt et bilde.

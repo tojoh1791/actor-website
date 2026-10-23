@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 var resetPassword = args.Contains("--reset-admin-password");
 var accountCommand = resetPassword || args.Contains("--create-admin");
+var demoCommand = args.Contains("--seed-demo-data");
 
 // Configure storage and security before building the request pipeline.
 builder.Services.AddProblemDetails();
@@ -32,10 +33,15 @@ EventImageStore.ConfigureLimits();
 // JSON requests here are small; reject oversized submissions before model binding.
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 64 * 1024);
 
-if (accountCommand)
+if (accountCommand || demoCommand)
     builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
 
 var app = builder.Build();
+if (demoCommand)
+{
+    Environment.ExitCode = await DemoDataCommand.RunAsync(app.Services);
+    return;
+}
 if (accountCommand)
 {
     Environment.ExitCode = await AdminAccountCommand.RunAsync(app.Services, resetPassword);

@@ -12,6 +12,7 @@
     "db:up": "docker compose up -d --wait db",
     "db:stop": "docker compose stop db",
     "db:migrate": "node --env-file=.env scripts/dotnet.mjs ef database update --project backend/ActorWebsite.Api",
+    "demo:seed": "node --env-file=.env scripts/dotnet.mjs run --project backend/ActorWebsite.Api --configuration Release --no-launch-profile -- --seed-demo-data",
     "tools:restore": "dotnet tool restore",
     "build:web": "npm --prefix frontend run build",
     "build:api": "dotnet build ActorWebsite.slnx --configuration Release --disable-build-servers -m:1",
