@@ -121,6 +121,18 @@ export default function EventList() {
                     Se gjennom og publiser
                   </Link>
                 )}
+                {item.isPublished && (
+                  <button
+                    type="button"
+                    className="admin-secondary"
+                    onClick={() => {
+                      setActionError('')
+                      setConfirmation({ item, action: 'hide' })
+                    }}
+                  >
+                    Skjul fra nettsiden
+                  </button>
+                )}
                 <button
                   type="button"
                   className="admin-delete-link"
@@ -132,23 +144,6 @@ export default function EventList() {
                   Slett arrangement
                 </button>
               </div>
-              {item.isPublished && (
-                <details>
-                  <summary>Flere valg</summary>
-                  <div className="admin-stack">
-                    <button
-                      type="button"
-                      className="admin-secondary"
-                      onClick={() => {
-                        setActionError('')
-                        setConfirmation({ item, action: 'hide' })
-                      }}
-                    >
-                      Skjul fra nettsiden
-                    </button>
-                  </div>
-                </details>
-              )}
             </article>
           ))}
       </div>

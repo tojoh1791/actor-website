@@ -25,7 +25,9 @@ Lokale npm-kommandoer laster .env og er laget for utviklingsmiljøet. På en dri
 - Forhåndsvisning før lagring og publisering.
 - Et utkast kan lagres uten å vises offentlig.
 - Publiserte, kommende arrangementer vises på /events.
+- Publiserte arrangementer med passert starttid vises under «Tidligere», med nyeste først. Også tidligere arrangementer kan skjules og publiseres igjen.
 - Skjul gjør et publisert arrangement til utkast.
+- «Skjul fra nettsiden» og «Slett arrangement» vises direkte på kortet, med bekreftelse før handlingen utføres.
 - Slett krever en bekreftelse og kan ikke angres.
 - Valgfrie opplysninger ligger under Flere opplysninger.
 - Alle tidspunkt redigeres i norsk tid (Europe/Oslo), uavhengig av telefonens tidssone, og lagres i UTC.

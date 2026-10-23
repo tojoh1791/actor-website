@@ -160,19 +160,39 @@ public sealed class AdminFlowTests
     }
 
     [Fact]
-    public async Task Public_list_hides_drafts_and_past_events_and_sorts_upcoming_events()
+    public async Task Public_views_filter_and_sort_dates_and_hide_unpublished_events()
     {
         await using var factory = new ApiFactory();
         using var client = await factory.ReadyClientAsync();
         await using (var scope = factory.Services.CreateAsyncScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            foreach (var (title, days, published) in new[] { ("Senere", 8, true), ("Først", 2, true), ("Utkast", 3, false), ("Tidligere", -1, true) })
+            foreach (var (title, days, published) in new[]
+            {
+                ("Senere", 8, true), ("Først", 2, true), ("Utkast", 3, false),
+                ("Eldst", -10, true), ("Tidligere", -1, true), ("Skjult historikk", -2, false)
+            })
                 db.Events.Add(new ActorEvent { Title = title, Description = "Test", Location = "Test", Address = "Test", StartsAt = DateTimeOffset.UtcNow.AddDays(days), IsPublished = published });
             await db.SaveChangesAsync();
         }
         var events = (await client.GetFromJsonAsync<ActorEvent[]>("/api/events"))!;
         Assert.Equal(new[] { "Først", "Senere" }, events.Select(item => item.Title));
+        var explicitUpcoming = (await client.GetFromJsonAsync<ActorEvent[]>("/api/events?past=false"))!;
+        Assert.Equal(events.Select(item => item.Id), explicitUpcoming.Select(item => item.Id));
+        var past = (await client.GetFromJsonAsync<ActorEvent[]>("/api/events?past=true"))!;
+        Assert.Equal(new[] { "Tidligere", "Eldst" }, past.Select(item => item.Title));
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync("/api/events?past=invalid")).StatusCode);
+
+        // Hiding applies to the archive too, and a past event can be made visible again.
+        await Login(client, factory);
+        var path = "/api/admin/events/" + past[0].Id + "/publication";
+        Assert.Equal(HttpStatusCode.OK, (await Send(client, HttpMethod.Patch, path, new { isPublished = false })).StatusCode);
+        var hidden = (await client.GetFromJsonAsync<ActorEvent[]>("/api/events?past=true"))!;
+        Assert.Equal("Eldst", Assert.Single(hidden).Title);
+        Assert.Equal(HttpStatusCode.OK, (await Send(client, HttpMethod.Patch, path, new { isPublished = true })).StatusCode);
+        var restored = (await client.GetFromJsonAsync<ActorEvent[]>("/api/events?past=true"))!;
+        Assert.Equal(past.Select(item => item.Id), restored.Select(item => item.Id));
+        Assert.Equal(new[] { "Først", "Senere" }, (await client.GetFromJsonAsync<ActorEvent[]>("/api/events"))!.Select(item => item.Title));
     }
 
 }

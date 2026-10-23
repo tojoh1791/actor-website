@@ -8,17 +8,21 @@ public static class EventEndpoints
 {
     public static void MapEventEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/events", async (ApplicationDbContext db, CancellationToken ct) =>
+        app.MapGet("/api/events", async (bool? past, ApplicationDbContext db, CancellationToken ct) =>
         {
             var now = DateTimeOffset.UtcNow;
-            var events = await db.Events.AsNoTracking()
-                .Where(e => e.IsPublished && e.StartsAt >= now)
-                .OrderBy(e => e.StartsAt)
+            // Publication is required in both views; hidden events never enter the public archive.
+            var query = db.Events.AsNoTracking()
+                .Where(e => e.IsPublished && (past == true ? e.StartsAt < now : e.StartsAt >= now));
+            var ordered = past == true
+                ? query.OrderByDescending(e => e.StartsAt)
+                : query.OrderBy(e => e.StartsAt);
+            var events = await ordered
                 .Select(e => new PublicEvent(e.Id, e.Title, e.Description, e.StartsAt,
                     e.EndsAt, e.Location, e.Address, e.Organizer, e.ExternalUrl, e.ImageUrl))
                 .ToListAsync(ct);
             return Results.Ok(events);
-        }).WithName("GetUpcomingEvents");
+        }).WithName("GetPublicEvents");
     }
 }
 

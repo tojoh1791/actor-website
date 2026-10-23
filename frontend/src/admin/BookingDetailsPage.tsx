@@ -198,9 +198,7 @@ export default function BookingDetailsPage() {
           statusen først.
         </p>
       )}
-      <details className="admin-help">
-        <summary>Flere valg</summary>
-        <p>Slett forespørsler du ikke lenger trenger å beholde.</p>
+      <div className="admin-stack">
         <button
           className="admin-delete-link"
           onClick={() => {
@@ -211,7 +209,7 @@ export default function BookingDetailsPage() {
         >
           Slett forespørselen
         </button>
-      </details>
+      </div>
       {deleting && (
         <ConfirmDialog
           title="Slette forespørselen?"

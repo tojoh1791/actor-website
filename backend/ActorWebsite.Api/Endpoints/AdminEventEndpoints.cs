@@ -54,8 +54,6 @@ public static class AdminEventEndpoints
             if (input.IsPublished)
             {
                 var errors = EventInput.From(item).Validate(images);
-                if (item.StartsAt < DateTimeOffset.UtcNow)
-                    errors["startsAt"] = ["Et arrangement som har startet kan ikke publiseres som kommende."];
                 if (errors.Count != 0) return Results.ValidationProblem(errors);
             }
             item.IsPublished = input.IsPublished;

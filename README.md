@@ -6,7 +6,7 @@ Prosjektet er utviklet med generativ KI som prototype til DAVE3625 ved OsloMet. 
 
 ## Funksjoner
 
-- Offentlige sider med biografi, foredrag, bok, arrangementer og booking.
+- Offentlige sider med biografi, foredrag, bok, kommende og tidligere arrangementer og booking.
 - Like store arrangementskort i sammenfoldet visning, med bilde, to linjer til tittel og «Mer» ved behov. På mobil vises ett kort i bredden.
 - Booking uten besøkskonto, med validering, spamvern og mottaksreferanse.
 - Privat administratorinnlogging og en mobiltilpasset innboks med statusfiltre.
@@ -114,7 +114,7 @@ Frontend bruker React-komponenter og hooks. Backend bruker Minimal API med egne 
 
 ## Demonstrasjon til innleveringen
 
-Kjør **npm run demo:seed** for å legge inn syv fiktive arrangementer og åtte bookingforespørsler i den lokale utviklingsdatabasen. Fem arrangementer vises offentlig; ett er tidligere og ett er et utkast. Datoene beregnes fra dagen kommandoen kjøres første gang. Kommandoen beholder eksisterende innhold og endringer og legger ikke inn duplikater ved gjentatt kjøring. Den kan bare kjøres i Development-miljøet.
+Kjør **npm run demo:seed** for å legge inn syv fiktive arrangementer og åtte bookingforespørsler i den lokale utviklingsdatabasen. Fem vises under «Kommende», ett under «Tidligere», og ett er et privat utkast. Datoene beregnes fra dagen kommandoen kjøres første gang. Kommandoen beholder eksisterende innhold og endringer og legger ikke inn duplikater ved gjentatt kjøring. Den kan bare kjøres i Development-miljøet.
 
 Se [demodata og kopierbare bookingeksempler](docs/demodata.md) for ferdig innhold til skjemaene og forslag til demonstrasjon. Alle demoarrangementer er fiktive og merket som demo.
 

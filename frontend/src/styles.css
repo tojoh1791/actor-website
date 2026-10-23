@@ -643,6 +643,39 @@ p {
   max-width: none;
 }
 /* Event cards: collapsed text reserves equal space; expanded cards grow independently */
+.event-filters {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+.event-filters button {
+  min-height: 48px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.event-filters button:hover {
+  background: white;
+}
+.event-filters button[aria-pressed='true'] {
+  background: var(--accent);
+  color: white;
+}
+.event-filters button[aria-pressed='true']:hover {
+  background: var(--accent-hover);
+}
+#event-results {
+  margin-top: 24px;
+}
 .event-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -15,7 +15,7 @@ const pageTitles: Record<string, string> = {
   '/about': 'Om Arben | Arben Bala',
   '/talks': 'Uten frykt – foredrag | Arben Bala',
   '/book': 'Balkanbrødre | Arben Bala',
-  '/events': 'Kommende arrangementer | Arben Bala',
+  '/events': 'Arrangementer | Arben Bala',
   '/contact': 'Kontakt og booking | Arben Bala',
   '/admin': 'Administrasjon | Arben Bala',
   '/admin/login': 'Innlogging | Arben Bala',

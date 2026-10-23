@@ -12,15 +12,15 @@ npm run demo:seed
 
 PostgreSQL må kjøre, og migreringene må være installert. Kommandoen bruker den lokale .env-konfigurasjonen og kan bare kjøres i Development. Den starter ingen webserver og oppretter ingen kontoer. Vanlig oppstart legger aldri inn demodata.
 
-| Arrangement                       | Tid fra første kjøring | Visning                               |
-| --------------------------------- | ---------------------- | ------------------------------------- |
-| Uten frykt – med håp              | 7 dager                | Offentlig                             |
-| Balkanbrødre: historien bak boken | 14 dager               | Offentlig                             |
-| Veien videre                      | 21 dager               | Offentlig                             |
-| Fra livshistorie til scenen       | 28 dager               | Offentlig, lang beskrivelse med «Mer» |
-| En kveld med Arben Bala           | 42 dager               | Offentlig                             |
-| Fortellinger om tilhørighet       | 14 dager tilbake       | Bare i adminhistorikken               |
-| Uten frykt – ny møteplass         | 35 dager               | Utkast, bare i admin                  |
+| Arrangement                       | Tid fra første kjøring | Visning                                   |
+| --------------------------------- | ---------------------- | ----------------------------------------- |
+| Uten frykt – med håp              | 7 dager                | Offentlig                                 |
+| Balkanbrødre: historien bak boken | 14 dager               | Offentlig                                 |
+| Veien videre                      | 21 dager               | Offentlig                                 |
+| Fra livshistorie til scenen       | 28 dager               | Offentlig, lang beskrivelse med «Mer»     |
+| En kveld med Arben Bala           | 42 dager               | Offentlig                                 |
+| Fortellinger om tilhørighet       | 14 dager tilbake       | Offentlig under «Tidligere», samt i admin |
+| Uten frykt – ny møteplass         | 35 dager               | Utkast, bare i admin                      |
 
 Arrangementene starter kl. 18.00 norsk tid og varer i 90 minutter. De bruker standardbildet av Arben. Møteplassene er fiktive; kartadressene peker til byene. De fem kommende arrangementene viser variasjon i titler, steder og tekstlengde.
 

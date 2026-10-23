@@ -18,7 +18,7 @@ Dato og klokkeslett redigeres i separate felt, fortsatt i norsk tid. Ønsket dat
 
 Et lagret arrangement administreres videre under «Mine arrangementer». Dette er forhåndsutfylling, ikke en varig kobling mellom postene: endringer i bookingstatus oppdaterer ikke arrangementet, og gjentatt oppretting kan lage flere arrangementer. Åpne derfor det eksisterende arrangementet for senere endringer. Ingen databasemigrering eller nye pakker kreves for denne funksjonen; start API-et på nytt etter oppdateringen.
 
-Sletting finnes under «Flere valg», krever bekreftelse og fjerner forespørselen fra databasen. Det finnes ingen automatisk sletterutine eller gjenoppretting i grensesnittet. Avklar hvilke opplysninger foretaket trenger å beholde, lagringstid og hvordan sikkerhetskopier håndteres før offentlig drift. Ingen fiktiv foretaksinformasjon er lagt inn; endelige firma- og kontaktopplysninger legges til når de er klare.
+«Slett forespørselen» vises direkte nederst på detaljsiden, krever bekreftelse og fjerner forespørselen fra databasen. Det finnes ingen automatisk sletterutine eller gjenoppretting i grensesnittet. Avklar hvilke opplysninger foretaket trenger å beholde, lagringstid og hvordan sikkerhetskopier håndteres før offentlig drift. Ingen fiktiv foretaksinformasjon er lagt inn; endelige firma- og kontaktopplysninger legges til når de er klare.
 
 ## Lagring og oppstart
 

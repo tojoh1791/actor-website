@@ -309,7 +309,8 @@ export default function EventEditorForm({
             </button>
           </div>
           <p className="admin-note">
-            Utkast er bare synlige for deg. Publiserte, kommende arrangementer vises for alle.
+            Utkast er bare synlige for deg. Publiserte arrangementer vises under «Kommende» eller
+            «Tidligere», avhengig av datoen.
           </p>
         </>
       ) : (
