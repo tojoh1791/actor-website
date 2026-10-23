@@ -49,7 +49,7 @@ public sealed class EventImageStore(IHostEnvironment environment, IConfiguration
             // or MIME type. Force that decoder so other formats/delegates cannot run.
             var bytes = buffer.GetBuffer();
             var format = buffer.Length >= 12 && bytes[0] == 0xff && bytes[1] == 0xd8 && bytes[2] == 0xff ? MagickFormat.Jpeg
-                : buffer.Length >= 12 && bytes.AsSpan(0, 8).SequenceEqual(new byte[] {137, 80, 78, 71, 13, 10, 26, 10}) ? MagickFormat.Png
+                : buffer.Length >= 12 && bytes.AsSpan(0, 8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }) ? MagickFormat.Png
                 : buffer.Length >= 12 && bytes.AsSpan(0, 4).SequenceEqual("RIFF"u8) && bytes.AsSpan(8, 4).SequenceEqual("WEBP"u8) ? MagickFormat.WebP
                 : throw new ImageUploadException("Velg et JPG-, PNG- eller WebP-bilde.");
             var options = new MagickReadSettings { Format = format, FrameCount = 1 };

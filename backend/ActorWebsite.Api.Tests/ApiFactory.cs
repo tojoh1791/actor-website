@@ -69,7 +69,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     {
         var client = CreateClient(new WebApplicationFactoryClientOptions
         {
-            BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false
+            BaseAddress = new Uri("https://localhost"),
+            AllowAutoRedirect = false
         });
         await using var scope = Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

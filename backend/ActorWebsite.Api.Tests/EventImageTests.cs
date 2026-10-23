@@ -36,8 +36,12 @@ public sealed class EventImageTests
     private const string EventImageEndpointsPath = "/api/admin/event-images";
     private static object EventBody(string? imageUrl) => new
     {
-        title = "Et arrangement med bilde", description = "Beskrivelse", location = "Biblioteket", address = "Testveien 1",
-        startsAt = DateTimeOffset.UtcNow.AddDays(30), imageUrl
+        title = "Et arrangement med bilde",
+        description = "Beskrivelse",
+        location = "Biblioteket",
+        address = "Testveien 1",
+        startsAt = DateTimeOffset.UtcNow.AddDays(30),
+        imageUrl
     };
 
     [Fact]

@@ -157,11 +157,34 @@ public sealed record BookingInput(Guid RequestId, string? ContactName, string? E
     public BookingRequest ToEntity(DateTimeOffset now)
     {
         static string? Optional(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-        var item = new BookingRequest { Id = RequestId, ContactName = ContactName!.Trim(), Email = Email!.Trim(),
-            Phone = Optional(Phone), Organization = Optional(Organization), EventType = EventType!, PreferredDate = PreferredDate,
-            Location = Location!.Trim(), Participants = Participants, Message = Message!.Trim(), SubmissionHash = "", CreatedAt = now, UpdatedAt = now };
-        var canonical = JsonSerializer.Serialize(new { item.ContactName, item.Email, item.Phone, item.Organization, item.EventType,
-            item.PreferredDate, item.Location, item.Participants, item.Message });
+        var item = new BookingRequest
+        {
+            Id = RequestId,
+            ContactName = ContactName!.Trim(),
+            Email = Email!.Trim(),
+            Phone = Optional(Phone),
+            Organization = Optional(Organization),
+            EventType = EventType!,
+            PreferredDate = PreferredDate,
+            Location = Location!.Trim(),
+            Participants = Participants,
+            Message = Message!.Trim(),
+            SubmissionHash = "",
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+        var canonical = JsonSerializer.Serialize(new
+        {
+            item.ContactName,
+            item.Email,
+            item.Phone,
+            item.Organization,
+            item.EventType,
+            item.PreferredDate,
+            item.Location,
+            item.Participants,
+            item.Message
+        });
         item.SubmissionHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical)));
         return item;
     }

@@ -11,7 +11,8 @@ The frontend contains:
 - Public website
 - Administration interface
 
-Responsibilities: 
+Responsibilities:
+
 - User interface
 - Navigation
 - Displaying event data
@@ -24,6 +25,7 @@ Responsibilities:
 ASP.NET Core application written in C# exposing a REST API.
 
 Responsibilities:
+
 - Event management
 - Authentication
 - Authorization
@@ -38,6 +40,7 @@ Entity Framework Core is planned for communication between the backend and the r
 PostgreSQL relational database.
 
 The database will initially store:
+
 - Events
 - Administrative user data required for authentication
 
@@ -63,6 +66,4 @@ Frontend -> REST API -> ASP.NET Core -> Entity Framwork Core -> PostgreSQL
 - `/admin` - Administration dashboard
 - `/admin/login` - Administrator login
 
-Additional administration routes may be introduced when the administration interface is designed. 
-
-
+Additional administration routes may be introduced when the administration interface is designed.

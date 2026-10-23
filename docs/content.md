@@ -3,6 +3,7 @@
 ## Home
 
 Needed:
+
 - Main portait / hero image
 - Actor name
 - Short introduction
@@ -13,6 +14,7 @@ Needed:
 ## About
 
 Needed:
+
 - Biography
 - Acting background
 - Information about the book and the story behind it
@@ -21,6 +23,7 @@ Needed:
 ## Events
 
 Needed for each event:
+
 - Title
 - Date
 - Time
@@ -34,17 +37,20 @@ Needed for each event:
 ## Contact
 
 Needed:
+
 - Contact email
 - Phone number (if it should be public)
 - Business information
 - Relevant social media links
 
 Future:
+
 - Booking /contact request form
 
 ## Assets
 
 Needed:
+
 - High-resolution portrait photos
 - Book cover
 - Other professional photographs

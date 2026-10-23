@@ -25,7 +25,11 @@ const pageTitles: Record<string, string> = {
 function PageNavigation() {
   const { pathname } = useLocation()
   useEffect(() => {
-    document.title = pageTitles[pathname] ?? (pathname.startsWith('/admin/') ? 'Kontrollpanel | Arben Bala' : 'Siden finnes ikke | Arben Bala')
+    document.title =
+      pageTitles[pathname] ??
+      (pathname.startsWith('/admin/')
+        ? 'Kontrollpanel | Arben Bala'
+        : 'Siden finnes ikke | Arben Bala')
     window.scrollTo({ top: 0, behavior: 'instant' })
     // Move focus after route changes so keyboard users reach the new content.
     document.getElementById('main')?.focus({ preventScroll: true })
@@ -35,22 +39,53 @@ function PageNavigation() {
 
 export default function App() {
   const { pathname } = useLocation()
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) return <><PageNavigation /><AdminApp /></>
-  return <>
-    <PageNavigation />
-    <a className="skip-link" href="#main">Hopp til innhold</a>
-    <SiteHeader key={pathname} />
-    <main id="main" tabIndex={-1}><Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/talks" element={<TalksPage />} />
-      <Route path="/book" element={<BookPage />} />
-      <Route path="/events" element={<EventsPage />} />
-      <Route path="/contact" element={<ContactPage />} />
+  if (pathname === '/admin' || pathname.startsWith('/admin/'))
+    return (
+      <>
+        <PageNavigation />
+        <AdminApp />
+      </>
+    )
+  return (
+    <>
+      <PageNavigation />
+      <a className="skip-link" href="#main">
+        Hopp til innhold
+      </a>
+      <SiteHeader key={pathname} />
+      <main id="main" tabIndex={-1}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/talks" element={<TalksPage />} />
+          <Route path="/book" element={<BookPage />} />
+          <Route path="/events" element={<EventsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
 
-
-      <Route path="*" element={<section className="page-heading"><h1>Siden finnes ikke</h1><Link to="/">Til forsiden</Link></section>} />
-    </Routes></main>
-    <footer className="site-footer"><div><Link className="brand" to="/">Arben Bala<span className="brand-dot">.</span></Link><p>Skuespiller og foredragsholder</p></div><div className="footer-links"><Link to="/events">Arrangementer</Link><BookingLink className="text-link" /></div><p className="footer-credit">Portrett: Are Næsset</p></footer>
-  </>
+          <Route
+            path="*"
+            element={
+              <section className="page-heading">
+                <h1>Siden finnes ikke</h1>
+                <Link to="/">Til forsiden</Link>
+              </section>
+            }
+          />
+        </Routes>
+      </main>
+      <footer className="site-footer">
+        <div>
+          <Link className="brand" to="/">
+            Arben Bala<span className="brand-dot">.</span>
+          </Link>
+          <p>Skuespiller og foredragsholder</p>
+        </div>
+        <div className="footer-links">
+          <Link to="/events">Arrangementer</Link>
+          <BookingLink className="text-link" />
+        </div>
+        <p className="footer-credit">Portrett: Are Næsset</p>
+      </footer>
+    </>
+  )
 }

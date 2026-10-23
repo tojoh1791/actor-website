@@ -1,0 +1,11 @@
+**/node_modules/
+**/dist/
+**/bin/
+**/obj/
+**/.data/
+**/packages.lock.json
+**/package-lock.json
+**/TestResults/
+**/coverage/
+.git/
+.env*

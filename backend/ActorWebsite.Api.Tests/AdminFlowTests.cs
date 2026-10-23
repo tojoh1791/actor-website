@@ -32,8 +32,17 @@ public sealed class AdminFlowTests
         Send(client, HttpMethod.Post, "/api/auth/login", new { email = ApiFactory.Email, password = password ?? factory.Password });
 
     private static object EventBody(string title = "Testforedrag", string? url = null, DateTimeOffset? end = null) =>
-        new { title, description = "En beskrivelse av arrangementet.", startsAt = DateTimeOffset.UtcNow.AddDays(30),
-            endsAt = end, location = "Testbiblioteket", address = "Testveien 1", organizer = "Testarrangør", externalUrl = url };
+        new
+        {
+            title,
+            description = "En beskrivelse av arrangementet.",
+            startsAt = DateTimeOffset.UtcNow.AddDays(30),
+            endsAt = end,
+            location = "Testbiblioteket",
+            address = "Testveien 1",
+            organizer = "Testarrangør",
+            externalUrl = url
+        };
 
     [Fact]
     public async Task Anonymous_cannot_read_or_modify_administration()

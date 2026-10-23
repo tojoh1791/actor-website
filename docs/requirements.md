@@ -5,6 +5,7 @@
 The website will serve as the official website for the actor and their business activities
 
 The main purposes of the website are to:
+
 - Present the actor and their background
 - Promote upcoming talks and other events
 - Provide information about the book based on the actor's life
@@ -24,40 +25,43 @@ The main purposes of the website are to:
 
 - Link to external ticket sales
 
-### Pages 
+### Pages
 
 #### Home
+
 - Introduction to the actor
 - Hero image
 - Short presentation
 - Preview of upcoming events
 
 #### About
+
 - Biography
 - Information about acting work and other relevant work
 
 #### Events
+
 - Display upcoming events in chronological order
 - Each event is displayed as an expandable interactive card
 - The collapsed card displays:
-    - Date
-    - Event title
-    - Location
+  - Date
+  - Event title
+  - Location
 - Selecting an event expands the card to display additional information
 - Additional information may include:
-    - Description
-    - Time
-    - Address
-    - Organizer
-    - External information or ticket link
+  - Description
+  - Time
+  - Address
+  - Organizer
+  - External information or ticket link
 - Past events should not appear as upcoming events
 - The event card must work on both desktop and mobile
 - The event card must be keyboard accessible
 
-#### Contact 
+#### Contact
+
 - Display relevant contact informasjon
 - Contact/booking request form, without visitor login, with a receipt on the website
-
 
 ## Administration
 
@@ -93,4 +97,3 @@ The main purposes of the website are to:
 - Event categories
 - Display of past events
 - Additional administrator/editor accounts
-

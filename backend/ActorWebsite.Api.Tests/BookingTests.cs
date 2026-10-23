@@ -19,12 +19,22 @@ public sealed class BookingTests
     private static async Task<JsonElement> Form(HttpClient client) => await client.GetFromJsonAsync<JsonElement>("/api/bookings/form");
     private static object Body(JsonElement form, Guid? requestId = null, string? email = null, string? website = null,
         DateOnly? date = null, string? eventType = null, string? token = null) => new
-    {
-        requestId = requestId ?? Guid.NewGuid(), contactName = "Testarrangør", email = email ?? "organizer@example.test", phone = "+47 12345678",
-        organization = "Testbiblioteket", eventType = eventType ?? "talk", preferredDate = date, location = "Oslo", participants = 120,
-        message = "Vi ønsker et foredrag for voksne deltakere på biblioteket.", submissionToken = token ?? form.GetProperty("submissionToken").GetString(), website,
-        status = "agreed", isPublished = true // Untrusted extra properties must not control administration.
-    };
+        {
+            requestId = requestId ?? Guid.NewGuid(),
+            contactName = "Testarrangør",
+            email = email ?? "organizer@example.test",
+            phone = "+47 12345678",
+            organization = "Testbiblioteket",
+            eventType = eventType ?? "talk",
+            preferredDate = date,
+            location = "Oslo",
+            participants = 120,
+            message = "Vi ønsker et foredrag for voksne deltakere på biblioteket.",
+            submissionToken = token ?? form.GetProperty("submissionToken").GetString(),
+            website,
+            status = "agreed",
+            isPublished = true // Untrusted extra properties must not control administration.
+        };
     private static async Task<HttpResponseMessage> Submit(HttpClient client, JsonElement form, object body, bool csrf = true)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/bookings/") { Content = JsonContent.Create(body) };
@@ -138,9 +148,17 @@ public sealed class BookingTests
         var date = new DateOnly(2027, 6, 18);
         var bookings = new[] { "talk", "book", "other" }.Select(type => new BookingRequest
         {
-            Id = Guid.NewGuid(), ContactName = "Privat kontaktperson", Email = "private@example.test", Phone = "+47 98765432",
-            Organization = type == "other" ? null : "Kulturhuset", EventType = type, PreferredDate = type == "other" ? null : date,
-            Location = "Oslo", Message = "Privat melding med opplysninger som ikke skal publiseres.", Status = "agreed", SubmissionHash = new string('a', 64)
+            Id = Guid.NewGuid(),
+            ContactName = "Privat kontaktperson",
+            Email = "private@example.test",
+            Phone = "+47 98765432",
+            Organization = type == "other" ? null : "Kulturhuset",
+            EventType = type,
+            PreferredDate = type == "other" ? null : date,
+            Location = "Oslo",
+            Message = "Privat melding med opplysninger som ikke skal publiseres.",
+            Status = "agreed",
+            SubmissionHash = new string('a', 64)
         }).ToArray();
         await using (var scope = factory.Services.CreateAsyncScope())
         {
@@ -182,8 +200,14 @@ public sealed class BookingTests
         var cases = new[] { ("acting", "agreed"), ("acting", "new"), ("talk", "new"), ("talk", "inProgress"), ("book", "declined"), ("other", "new"), ("unknown", "agreed") };
         var bookings = cases.Select(value => new BookingRequest
         {
-            Id = Guid.NewGuid(), ContactName = "Testperson", Email = "test@example.test", EventType = value.Item1,
-            Status = value.Item2, Location = "Oslo", Message = "En privat testforespørsel.", SubmissionHash = new string('b', 64)
+            Id = Guid.NewGuid(),
+            ContactName = "Testperson",
+            Email = "test@example.test",
+            EventType = value.Item1,
+            Status = value.Item2,
+            Location = "Oslo",
+            Message = "En privat testforespørsel.",
+            SubmissionHash = new string('b', 64)
         }).ToArray();
         await using (var scope = factory.Services.CreateAsyncScope())
         {
