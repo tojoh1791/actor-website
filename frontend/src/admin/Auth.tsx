@@ -1,17 +1,20 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { errorMessage, ApiError, api } from '../lib/http'
+import { useCallback, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { ApiError, api } from './api'
-import type { AdminUser } from './api'
+import type { AdminUser } from '../types/auth'
 
-interface AuthContextValue {
-  user: AdminUser | null
-  loading: boolean
-  error: string
-  refresh: () => Promise<void>
-  login: (email: string, password: string, rememberMe: boolean) => Promise<void>
-  logout: () => Promise<void>
+import { AuthContext } from './authContext'
+
+async function currentUser(signal?: AbortSignal): Promise<AdminUser | null> {
+  try {
+    return await api<AdminUser>('/api/auth/me', { signal })
+  } catch (reason) {
+    // An anonymous visitor is a normal login state; connection failures must stay visible.
+    if (reason instanceof ApiError && reason.status === 401) return null
+    throw reason
+  }
 }
-const AuthContext = createContext<AuthContextValue | null>(null)
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(null)
   const [loading, setLoading] = useState(true)
@@ -20,18 +23,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     setError('')
     try {
-      setUser(await api<AdminUser>('/api/auth/me'))
+      setUser(await currentUser())
     } catch (reason) {
-      if (reason instanceof ApiError && reason.status === 401) setUser(null)
-      else
-        setError(reason instanceof Error ? reason.message : 'Kunne ikke kontrollere innloggingen.')
+      setError(errorMessage(reason, 'Kunne ikke kontrollere innloggingen.'))
     } finally {
       setLoading(false)
     }
   }, [])
   useEffect(() => {
-    void refresh()
-  }, [refresh])
+    const controller = new AbortController()
+    currentUser(controller.signal)
+      .then((value) => {
+        if (!controller.signal.aborted) setUser(value)
+      })
+      .catch((reason) => {
+        if (!controller.signal.aborted)
+          setError(errorMessage(reason, 'Kunne ikke kontrollere innloggingen.'))
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
+    return () => controller.abort()
+  }, [])
   useEffect(() => {
     const expire = () => setUser(null)
     window.addEventListener('admin-session-expired', expire)
@@ -54,9 +67,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   )
-}
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error('AuthProvider mangler.')
-  return context
 }

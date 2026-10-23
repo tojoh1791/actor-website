@@ -1,3 +1,4 @@
+using static ActorWebsite.Api.Tests.TestRequests;
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -14,23 +15,6 @@ namespace ActorWebsite.Api.Tests;
 
 public sealed class AdminFlowTests
 {
-    private static async Task<string> Csrf(HttpClient client)
-    {
-        var token = await client.GetFromJsonAsync<Token>("/api/auth/csrf");
-        return token!.TokenValue;
-    }
-
-    private static async Task<HttpResponseMessage> Send(HttpClient client, HttpMethod method, string url, object? body = null)
-    {
-        var request = new HttpRequestMessage(method, url);
-        request.Headers.Add("X-CSRF-TOKEN", await Csrf(client));
-        if (body is not null) request.Content = JsonContent.Create(body);
-        return await client.SendAsync(request);
-    }
-
-    private static Task<HttpResponseMessage> Login(HttpClient client, ApiFactory factory, string? password = null) =>
-        Send(client, HttpMethod.Post, "/api/auth/login", new { email = ApiFactory.Email, password = password ?? factory.Password });
-
     private static object EventBody(string title = "Testforedrag", string? url = null, DateTimeOffset? end = null) =>
         new
         {
@@ -191,5 +175,4 @@ public sealed class AdminFlowTests
         Assert.Equal(new[] { "Først", "Senere" }, events.Select(item => item.Title));
     }
 
-    private sealed record Token([property: System.Text.Json.Serialization.JsonPropertyName("token")] string TokenValue);
 }

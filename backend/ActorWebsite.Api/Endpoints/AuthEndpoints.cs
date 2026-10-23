@@ -1,3 +1,4 @@
+using ActorWebsite.Api.Contracts;
 using ActorWebsite.Api.Models;
 using ActorWebsite.Api.Security;
 using Microsoft.AspNetCore.Antiforgery;
@@ -49,4 +50,3 @@ public static class AuthEndpoints
     }
 }
 
-public sealed record LoginInput(string? Email, string? Password, bool RememberMe = false);

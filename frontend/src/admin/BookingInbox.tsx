@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useApiQuery } from '../hooks/useApiQuery'
+import AdminRequestError from './AdminRequestError'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
-import { api, eventDate } from './api'
-import { bookingDate, bookingStatuses, bookingTypes } from '../types/booking'
+import { eventDate, bookingDate } from '../lib/dateTime'
+import { bookingStatuses, bookingTypes } from '../types/booking'
 import type { BookingSummary } from '../types/booking'
 
 interface InboxPage {
@@ -15,30 +16,10 @@ export default function BookingInbox() {
   const [search, setSearch] = useSearchParams()
   const status = search.get('status') ?? 'all'
   const page = Math.max(1, Number(search.get('page')) || 1)
-  const [data, setData] = useState<InboxPage | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [retry, setRetry] = useState(0)
   const location = useLocation()
-  useEffect(() => {
-    let active = true
-    setLoading(true)
-    setError('')
-    api<InboxPage>('/api/admin/bookings/?' + new URLSearchParams({ status, page: String(page) }))
-      .then((value) => {
-        if (active) setData(value)
-      })
-      .catch((reason) => {
-        if (active)
-          setError(reason instanceof Error ? reason.message : 'Kunne ikke hente forespørslene.')
-      })
-      .finally(() => {
-        if (active) setLoading(false)
-      })
-    return () => {
-      active = false
-    }
-  }, [status, page, retry])
+  const { data, loading, error, reload } = useApiQuery<InboxPage>(
+    '/api/admin/bookings/?' + new URLSearchParams({ status, page: String(page) }),
+  )
   return (
     <section>
       <p className="eyebrow">Booking via nettsiden</p>
@@ -63,14 +44,7 @@ export default function BookingInbox() {
         ))}
       </select>
       {loading && <p role="status">Henter forespørsler …</p>}
-      {error && (
-        <div role="alert" className="admin-error">
-          <p>{error}</p>
-          <button className="admin-secondary" onClick={() => setRetry((value) => value + 1)}>
-            Prøv igjen
-          </button>
-        </div>
-      )}
+      {error && <AdminRequestError message={error} onRetry={reload} />}
       {!loading && !error && data && (
         <>
           {data.items.length === 0 ? (

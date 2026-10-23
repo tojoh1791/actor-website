@@ -1,86 +1,20 @@
-import { useEffect, useState } from 'react'
+import { errorMessage } from '../lib/http'
+import Dashboard from './Dashboard'
+import AdminRequestError from './AdminRequestError'
+import { useState } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import { AuthProvider, useAuth } from './Auth'
+import { AuthProvider } from './Auth'
+import { useAuth } from './useAuth'
 import LoginPage from './LoginPage'
 import EventList from './EventList'
 import EventEditor from './EventEditor'
 import BookingInbox from './BookingInbox'
 import BookingDetailsPage from './BookingDetailsPage'
-import { api } from './api'
 import './admin.css'
-
-function Dashboard() {
-  const [newCount, setNewCount] = useState<number | null>(null)
-  const [countError, setCountError] = useState(false)
-  useEffect(() => {
-    let active = true
-    api<{ newCount: number }>('/api/admin/bookings/summary')
-      .then((value) => {
-        if (active) setNewCount(value.newCount)
-      })
-      .catch(() => {
-        if (active) setCountError(true)
-      })
-    return () => {
-      active = false
-    }
-  }, [])
-  return (
-    <section className="admin-dashboard">
-      <p className="eyebrow">Ditt kontrollpanel</p>
-      <h1>Hei, Arben.</h1>
-      <p>Hva vil du gjøre?</p>
-      <div className="admin-stack">
-        <Link className="admin-primary" to="/admin/events/new">
-          + Legg til arrangement
-        </Link>
-        <Link
-          className="admin-menu-card"
-          to={newCount ? '/admin/bookings?status=new' : '/admin/bookings'}
-        >
-          <span>
-            <strong>
-              Forespørsler{' '}
-              {newCount !== null && newCount > 0 && (
-                <span className="admin-new-count">
-                  {newCount} {newCount === 1 ? 'ny' : 'nye'}
-                </span>
-              )}
-            </strong>
-            <span>
-              {countError
-                ? 'Åpne innboksen for å hente forespørslene'
-                : newCount === null
-                  ? 'Henter antall nye …'
-                  : newCount
-                    ? 'Nye arrangører venter på svar'
-                    : 'Les henvendelser og følg opp avtaler'}
-            </span>
-          </span>
-          <span aria-hidden="true">→</span>
-        </Link>
-        <Link className="admin-menu-card" to="/admin/events">
-          <span>
-            <strong>Mine arrangementer</strong>
-            <span>Endre innhold og hva publikum ser</span>
-          </span>
-          <span aria-hidden="true">→</span>
-        </Link>
-        <a className="admin-menu-card" href="/events" target="_blank" rel="noreferrer">
-          <span>
-            <strong>Se den offentlige nettsiden</strong>
-            <span>Åpnes i en ny fane</span>
-          </span>
-          <span aria-hidden="true">↗</span>
-        </a>
-      </div>
-    </section>
-  )
-}
 
 function AdminRoutes() {
   const auth = useAuth()
-  const { pathname, search } = useLocation()
+  const { pathname } = useLocation()
   const path = pathname.replace(/\/+$/, '')
   const showNavigation = auth.user && path !== '/admin' && path !== '/admin/login'
   const parent = path.startsWith('/admin/events/')
@@ -90,6 +24,19 @@ function AdminRoutes() {
       : null
   const [logoutError, setLogoutError] = useState('')
   const [loggingOut, setLoggingOut] = useState(false)
+  async function logout() {
+    if (loggingOut) return
+    setLoggingOut(true)
+    setLogoutError('')
+    try {
+      await auth.logout()
+    } catch (reason) {
+      setLogoutError(errorMessage(reason, 'Kunne ikke logge ut.'))
+    } finally {
+      setLoggingOut(false)
+    }
+  }
+
   return (
     <div className="admin-shell">
       <a className="skip-link" href="#main">
@@ -101,21 +48,7 @@ function AdminRoutes() {
         </Link>
         <span>Kontrollpanel</span>
         {auth.user && (
-          <button
-            className="admin-logout"
-            disabled={loggingOut}
-            onClick={async () => {
-              setLoggingOut(true)
-              setLogoutError('')
-              try {
-                await auth.logout()
-              } catch (reason) {
-                setLogoutError(reason instanceof Error ? reason.message : 'Kunne ikke logge ut.')
-              } finally {
-                setLoggingOut(false)
-              }
-            }}
-          >
+          <button className="admin-logout" disabled={loggingOut} onClick={logout}>
             {loggingOut ? 'Logger ut …' : 'Logg ut'}
           </button>
         )}
@@ -141,12 +74,7 @@ function AdminRoutes() {
         {auth.loading ? (
           <p role="status">Kontrollerer innloggingen …</p>
         ) : auth.error ? (
-          <div role="alert" className="admin-error">
-            <p>{auth.error}</p>
-            <button className="admin-secondary" onClick={() => void auth.refresh()}>
-              Prøv igjen
-            </button>
-          </div>
+          <AdminRequestError message={auth.error} onRetry={() => void auth.refresh()} />
         ) : !auth.user && pathname !== '/admin/login' ? (
           <Navigate to="/admin/login" replace />
         ) : (
@@ -154,7 +82,7 @@ function AdminRoutes() {
             <Route path="/admin/login" element={<LoginPage />} />
             <Route path="/admin" element={<Dashboard />} />
             <Route path="/admin/events" element={<EventList />} />
-            <Route path="/admin/events/new" element={<EventEditor key={'new' + search} />} />
+            <Route path="/admin/events/new" element={<EventEditor />} />
             <Route path="/admin/events/:id" element={<EventEditor key={pathname} />} />
             <Route path="/admin/bookings" element={<BookingInbox />} />
             <Route path="/admin/bookings/:id" element={<BookingDetailsPage key={pathname} />} />

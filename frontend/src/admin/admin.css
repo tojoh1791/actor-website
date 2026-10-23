@@ -1,3 +1,4 @@
+/* Admin shell and page layout */
 .admin-shell {
   min-height: 100dvh;
   background: #f8f6f0;
@@ -87,6 +88,7 @@ main.admin-main {
 .admin-date-time .admin-field {
   min-width: 0;
 }
+/* Actions and editable fields */
 .admin-stack {
   display: flex;
   flex-direction: column;
@@ -212,6 +214,7 @@ main.admin-main {
 .admin-main details p {
   margin-top: 12px;
 }
+/* Feedback and helper text */
 .admin-error,
 .admin-success {
   padding: 18px;
@@ -246,6 +249,7 @@ main.admin-main {
 .admin-note {
   margin-top: 10px;
 }
+/* Dashboard and event lists */
 .admin-menu-card {
   display: flex;
   gap: 20px;
@@ -320,6 +324,7 @@ main.admin-main {
   padding: 12px;
   cursor: pointer;
 }
+/* Confirmation dialogs */
 .admin-dialog {
   width: min(100% - 32px, 450px);
   max-height: calc(100dvh - 40px);
@@ -342,6 +347,7 @@ main.admin-main {
 .admin-dialog p {
   overflow-wrap: anywhere;
 }
+/* Consistent back navigation */
 .admin-navigation {
   display: flex;
   flex-wrap: wrap;
@@ -381,6 +387,7 @@ main.admin-main {
 .admin-url {
   overflow-wrap: anywhere;
 }
+/* Event image selection and preview */
 .admin-image-picker {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -436,6 +443,7 @@ main.admin-main {
   display: flex;
   align-items: center;
 }
+/* Booking inbox and detail view */
 .admin-booking-list {
   display: grid;
   gap: 20px;

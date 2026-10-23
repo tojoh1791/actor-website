@@ -1,6 +1,9 @@
+import { errorMessage, ApiError, api } from '../lib/http'
+import { useApiQuery } from '../hooks/useApiQuery'
+import { useNow } from '../hooks/useNow'
+import { osloDate } from '../lib/dateTime'
 import { useEffect, useRef, useState } from 'react'
-import type { ChangeEvent } from 'react'
-import { ApiError, api } from '../lib/http'
+import type { ChangeEvent, FormEvent } from 'react'
 import { bookingTypes } from '../types/booking'
 
 interface FormValues {
@@ -34,46 +37,68 @@ interface FormSettings {
 
 export default function BookingForm() {
   const [form, setForm] = useState<FormValues>(blank)
-  const [settings, setSettings] = useState<FormSettings | null>(null)
+  const {
+    data: settings,
+    loading,
+    error: loadError,
+    reload,
+  } = useApiQuery<FormSettings>('/api/bookings/form')
+  const now = useNow()
   const [requestId, setRequestId] = useState(() => crypto.randomUUID())
-  const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [fields, setFields] = useState<Record<string, string[]>>({})
   const [refreshNeeded, setRefreshNeeded] = useState(false)
   const [reference, setReference] = useState('')
-  const [retry, setRetry] = useState(0)
   const feedback = useRef<HTMLDivElement>(null)
   const successHeading = useRef<HTMLHeadingElement>(null)
-  useEffect(() => {
-    const controller = new AbortController()
-    setLoading(true)
-    api<FormSettings>('/api/bookings/form', { signal: controller.signal })
-      .then((value) => {
-        setSettings(value)
-        setError('')
-        setRefreshNeeded(false)
-      })
-      .catch(() => {
-        if (!controller.signal.aborted)
-          setError('Kunne ikke åpne bookingskjemaet. Prøv igjen om litt.')
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-    return () => controller.abort()
-  }, [retry])
+  const displayedError = error || loadError
   useEffect(() => {
     if (reference) successHeading.current?.focus()
   }, [reference])
   useEffect(() => {
-    if (error && !loading) feedback.current?.focus()
-  }, [error, loading])
+    if (displayedError && !loading) feedback.current?.focus()
+  }, [displayedError, loading])
+  async function submitBooking(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (busy || loading || !settings) return
+    setBusy(true)
+    setError('')
+    setFields({})
+    setRefreshNeeded(false)
+    try {
+      const result = await api<{ reference: string }>('/api/bookings/', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': settings.csrfToken },
+        body: JSON.stringify({
+          ...form,
+          requestId,
+          preferredDate: form.preferredDate || null,
+          participants: form.participants ? Number(form.participants) : null,
+          submissionToken: settings.submissionToken,
+        }),
+      })
+      setReference(result.reference)
+    } catch (reason) {
+      setError(errorMessage(reason, 'Kunne ikke sende forespørselen. Prøv igjen.'))
+      if (reason instanceof ApiError) {
+        setFields(reason.fields)
+        setRefreshNeeded(
+          (reason.status === 400 && Object.keys(reason.fields).length === 0) ||
+            reason.status === 409,
+        )
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const change = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = event.target
     setForm((previous) => ({ ...previous, [name]: value }))
+    // Reuse the ID for an unchanged retry; changed content is a new submission.
     setRequestId(crypto.randomUUID())
   }
   const field = (
@@ -112,9 +137,7 @@ export default function BookingForm() {
             type={options.type ?? 'text'}
             {...(name === 'preferredDate'
               ? {
-                  min: new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Oslo' }).format(
-                    new Date(),
-                  ),
+                  min: osloDate(now),
                 }
               : {})}
             {...(name === 'participants' ? { min: 1, max: 100000, step: 1 } : {})}
@@ -154,15 +177,19 @@ export default function BookingForm() {
       <p className="eyebrow">Direkte til Arben</p>
       <h2>Send en forespørsel.</h2>
       <p>Fortell litt om hva dere planlegger. Dere trenger ikke ha alle detaljene klare.</p>
-      {error && (
+      {displayedError && (
         <div className="booking-error" role="alert" tabIndex={-1} ref={feedback}>
-          <p>{error}</p>
+          <p>{displayedError}</p>
           {(!settings || refreshNeeded) && (
             <button
               type="button"
               className="booking-retry"
               disabled={loading}
-              onClick={() => setRetry((value) => value + 1)}
+              onClick={() => {
+                setError('')
+                setRefreshNeeded(false)
+                reload()
+              }}
             >
               Last inn skjemaet på nytt
             </button>
@@ -171,45 +198,7 @@ export default function BookingForm() {
       )}
       {loading && <p role="status">Åpner skjemaet …</p>}
       {settings && (
-        <form
-          onSubmit={async (event) => {
-            event.preventDefault()
-            if (busy || loading) return
-            setBusy(true)
-            setError('')
-            setFields({})
-            setRefreshNeeded(false)
-            try {
-              const result = await api<{ reference: string }>('/api/bookings/', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': settings.csrfToken },
-                body: JSON.stringify({
-                  ...form,
-                  requestId,
-                  preferredDate: form.preferredDate || null,
-                  participants: form.participants ? Number(form.participants) : null,
-                  submissionToken: settings.submissionToken,
-                }),
-              })
-              setReference(result.reference)
-            } catch (reason) {
-              setError(
-                reason instanceof Error
-                  ? reason.message
-                  : 'Kunne ikke sende forespørselen. Prøv igjen.',
-              )
-              if (reason instanceof ApiError) {
-                setFields(reason.fields)
-                setRefreshNeeded(
-                  (reason.status === 400 && Object.keys(reason.fields).length === 0) ||
-                    reason.status === 409,
-                )
-              }
-            } finally {
-              setBusy(false)
-            }
-          }}
-        >
+        <form onSubmit={submitBooking}>
           <fieldset disabled={busy || loading} className="booking-fields">
             <legend className="visually-hidden">Opplysninger om bookingforespørselen</legend>
             <div className="booking-field-row">

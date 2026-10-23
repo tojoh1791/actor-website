@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var resetPassword = args.Contains("--reset-admin-password");
+var accountCommand = resetPassword || args.Contains("--create-admin");
+
+// Configure storage and security before building the request pipeline.
 builder.Services.AddProblemDetails();
 if (builder.Environment.IsDevelopment())
 {
@@ -28,13 +32,13 @@ EventImageStore.ConfigureLimits();
 // JSON requests here are small; reject oversized submissions before model binding.
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 64 * 1024);
 
-if (args.Contains("--create-admin") || args.Contains("--reset-admin-password"))
+if (accountCommand)
     builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
 
 var app = builder.Build();
-if (args.Contains("--create-admin") || args.Contains("--reset-admin-password"))
+if (accountCommand)
 {
-    Environment.ExitCode = await AdminAccountCommand.RunAsync(app.Services, args.Contains("--reset-admin-password"));
+    Environment.ExitCode = await AdminAccountCommand.RunAsync(app.Services, resetPassword);
     return;
 }
 app.UseExceptionHandler();
@@ -51,6 +55,7 @@ app.Use(async (context, next) =>
         context.Response.Headers.CacheControl = "no-store";
     await next();
 });
+// Authenticate before authorization and rate limiting inspect the request.
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();

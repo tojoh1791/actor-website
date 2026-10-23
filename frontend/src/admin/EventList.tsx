@@ -1,15 +1,25 @@
-import { useEffect, useState } from 'react'
+import { errorMessage, api } from '../lib/http'
+import { useApiQuery } from '../hooks/useApiQuery'
+import { useNow } from '../hooks/useNow'
+import AdminRequestError from './AdminRequestError'
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { api, eventDate } from './api'
-import type { AdminEvent } from './api'
+import { eventDate } from '../lib/dateTime'
+import type { AdminEvent } from '../types/event'
 import ConfirmDialog from './ConfirmDialog'
 import EventImage from '../components/EventImage'
 
 export default function EventList() {
   const location = useLocation()
-  const [events, setEvents] = useState<AdminEvent[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const {
+    data,
+    loading,
+    error,
+    reload,
+    setData: setEvents,
+  } = useApiQuery<AdminEvent[]>('/api/admin/events/')
+  const events = data ?? []
+  const now = useNow()
   const [notice, setNotice] = useState((location.state as { notice?: string } | null)?.notice ?? '')
   const [confirmation, setConfirmation] = useState<{
     item: AdminEvent
@@ -18,22 +28,42 @@ export default function EventList() {
   const [busy, setBusy] = useState(false)
   const [actionError, setActionError] = useState('')
   const [filter, setFilter] = useState('upcoming')
-  const load = () => {
-    setLoading(true)
-    setError('')
-    api<AdminEvent[]>('/api/admin/events/')
-      .then(setEvents)
-      .catch((reason) =>
-        setError(reason instanceof Error ? reason.message : 'Kunne ikke hente arrangementer.'),
-      )
-      .finally(() => setLoading(false))
-  }
-  useEffect(load, [])
   const visible = events.filter(
     (item) =>
       filter === 'all' ||
-      (filter === 'drafts' ? !item.isPublished : new Date(item.startsAt) >= new Date()),
+      (filter === 'drafts' ? !item.isPublished : new Date(item.startsAt).getTime() >= now),
   )
+  async function confirmAction() {
+    if (!confirmation || busy) return
+    setBusy(true)
+    setActionError('')
+    try {
+      const { item, action } = confirmation
+      if (action === 'delete') {
+        await api('/api/admin/events/' + item.id, { method: 'DELETE' })
+        setEvents((previous) => (previous ?? []).filter((entry) => entry.id !== item.id))
+      } else {
+        const updated = await api<AdminEvent>('/api/admin/events/' + item.id + '/publication', {
+          method: 'PATCH',
+          body: JSON.stringify({ isPublished: false }),
+        })
+        setEvents((previous) =>
+          (previous ?? []).map((entry) => (entry.id === updated.id ? updated : entry)),
+        )
+      }
+      setConfirmation(null)
+      setNotice(
+        action === 'delete'
+          ? 'Arrangementet er slettet.'
+          : 'Arrangementet er skjult fra nettsiden.',
+      )
+    } catch (reason) {
+      setActionError(errorMessage(reason, 'Handlingen kunne ikke fullføres.'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <section>
       <div className="admin-section-heading">
@@ -57,14 +87,7 @@ export default function EventList() {
         <option value="all">Alle, også tidligere</option>
       </select>
       {loading && <p role="status">Henter arrangementer …</p>}
-      {error && (
-        <div role="alert" className="admin-error">
-          <p>{error}</p>
-          <button className="admin-secondary" type="button" onClick={load}>
-            Prøv igjen
-          </button>
-        </div>
-      )}
+      {error && <AdminRequestError message={error} onRetry={reload} />}
       {!loading && !error && visible.length === 0 && (
         <div className="admin-card">
           <h2>Ingen arrangementer i denne visningen.</h2>
@@ -78,7 +101,7 @@ export default function EventList() {
               <EventImage imageUrl={item.imageUrl} />
               <span className={'admin-status ' + (item.isPublished ? 'published' : '')}>
                 {item.isPublished
-                  ? new Date(item.startsAt) < new Date()
+                  ? new Date(item.startsAt).getTime() < now
                     ? 'Tidligere arrangement'
                     : 'Synlig på nettsiden'
                   : 'Utkast – bare synlig for deg'}
@@ -147,37 +170,7 @@ export default function EventList() {
           busy={busy}
           error={actionError}
           onClose={() => setConfirmation(null)}
-          onConfirm={async () => {
-            setBusy(true)
-            setActionError('')
-            try {
-              const { item, action } = confirmation
-              if (action === 'delete') {
-                await api('/api/admin/events/' + item.id, { method: 'DELETE' })
-                setEvents((previous) => previous.filter((entry) => entry.id !== item.id))
-              } else {
-                const updated = await api<AdminEvent>(
-                  '/api/admin/events/' + item.id + '/publication',
-                  { method: 'PATCH', body: JSON.stringify({ isPublished: false }) },
-                )
-                setEvents((previous) =>
-                  previous.map((entry) => (entry.id === updated.id ? updated : entry)),
-                )
-              }
-              setConfirmation(null)
-              setNotice(
-                action === 'delete'
-                  ? 'Arrangementet er slettet.'
-                  : 'Arrangementet er skjult fra nettsiden.',
-              )
-            } catch (reason) {
-              setActionError(
-                reason instanceof Error ? reason.message : 'Handlingen kunne ikke fullføres.',
-              )
-            } finally {
-              setBusy(false)
-            }
-          }}
+          onConfirm={confirmAction}
         />
       )}
     </section>

@@ -1,0 +1,6 @@
+# Match EditorConfig and Prettier on Windows and in CI.
+* text=auto eol=lf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary

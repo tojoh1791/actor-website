@@ -10,3 +10,21 @@ export interface ActorEvent {
   externalUrl: string | null
   imageUrl: string | null
 }
+
+export interface AdminEvent extends ActorEvent {
+  isPublished: boolean
+  createdAt: string
+  updatedAt: string
+}
+export type EventInput = Pick<
+  ActorEvent,
+  | 'title'
+  | 'description'
+  | 'startsAt'
+  | 'endsAt'
+  | 'location'
+  | 'address'
+  | 'organizer'
+  | 'externalUrl'
+  | 'imageUrl'
+>

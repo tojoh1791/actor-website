@@ -1,3 +1,4 @@
+using static ActorWebsite.Api.Tests.TestRequests;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -10,20 +11,6 @@ namespace ActorWebsite.Api.Tests;
 
 public sealed class EventImageTests
 {
-    private static async Task<string> Csrf(HttpClient client) =>
-        (await client.GetFromJsonAsync<JsonElement>("/api/auth/csrf")).GetProperty("token").GetString()!;
-
-    private static async Task<HttpResponseMessage> Send(HttpClient client, HttpMethod method, string path, object body)
-    {
-        using var request = new HttpRequestMessage(method, path) { Content = JsonContent.Create(body) };
-        request.Headers.Add("X-CSRF-TOKEN", await Csrf(client));
-        return await client.SendAsync(request);
-    }
-
-    private static async Task Login(HttpClient client, ApiFactory factory) =>
-        Assert.Equal(HttpStatusCode.OK, (await Send(client, HttpMethod.Post, "/api/auth/login",
-            new { email = ApiFactory.Email, password = factory.Password })).StatusCode);
-
     private static async Task<HttpResponseMessage> Upload(HttpClient client, byte[] bytes, bool csrf = true)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, EventImageEndpointsPath)
@@ -50,7 +37,7 @@ public sealed class EventImageTests
         await using var factory = new ApiFactory();
         using var client = await factory.ReadyClientAsync();
         Assert.Equal(HttpStatusCode.Unauthorized, (await Upload(client, [1, 2, 3], false)).StatusCode);
-        await Login(client, factory);
+        await SignIn(client, factory);
         Assert.Equal(HttpStatusCode.BadRequest, (await Upload(client, [1, 2, 3], false)).StatusCode);
     }
 
@@ -62,7 +49,7 @@ public sealed class EventImageTests
     {
         await using var factory = new ApiFactory();
         using var client = await factory.ReadyClientAsync();
-        await Login(client, factory);
+        await SignIn(client, factory);
         using var image = new MagickImage(MagickColors.Green, 100, 80);
         var uploaded = await Upload(client, image.ToByteArray(format));
         Assert.Equal(HttpStatusCode.Created, uploaded.StatusCode);
@@ -84,7 +71,7 @@ public sealed class EventImageTests
     {
         await using var factory = new ApiFactory();
         using var client = await factory.ReadyClientAsync();
-        await Login(client, factory);
+        await SignIn(client, factory);
         using var image = new MagickImage(MagickColors.Green, 3000, 1500);
         var exif = new ExifProfile();
         exif.SetValue(ExifTag.ImageDescription, "Private image metadata");
@@ -117,7 +104,7 @@ public sealed class EventImageTests
     {
         await using var factory = new ApiFactory();
         using var client = await factory.ReadyClientAsync();
-        await Login(client, factory);
+        await SignIn(client, factory);
         foreach (var bytes in new[] { "<script>alert(1)</script>"u8.ToArray(), "<svg xmlns='http://www.w3.org/2000/svg'/>"u8.ToArray(),
             new byte[] { 137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0 } })
             Assert.Equal(HttpStatusCode.BadRequest, (await Upload(client, bytes)).StatusCode);

@@ -2,11 +2,7 @@ import { useId, useLayoutEffect, useRef, useState } from 'react'
 import type { ActorEvent } from '../types/event'
 import EventImage from './EventImage'
 
-const dateFormat = new Intl.DateTimeFormat('nb-NO', {
-  dateStyle: 'long',
-  timeStyle: 'short',
-  timeZone: 'Europe/Oslo',
-})
+import { eventDate } from '../lib/dateTime'
 
 export default function EventCard({ event }: { event: ActorEvent }) {
   const [expanded, setExpanded] = useState(false)
@@ -46,7 +42,7 @@ export default function EventCard({ event }: { event: ActorEvent }) {
       <div className="event-card-body">
         <div className="event-card-content" id={contentId}>
           <time className="event-date" data-collapsed-text dateTime={event.startsAt}>
-            {dateFormat.format(new Date(event.startsAt))}
+            {eventDate.format(new Date(event.startsAt))}
           </time>
           <h2 data-collapsed-text>{event.title}</h2>
           <p className="event-place">
@@ -61,7 +57,7 @@ export default function EventCard({ event }: { event: ActorEvent }) {
             {event.description}
           </p>
           <div className="event-extra" hidden={!expanded}>
-            {event.endsAt && <p>Slutter: {dateFormat.format(new Date(event.endsAt))}</p>}
+            {event.endsAt && <p>Slutter: {eventDate.format(new Date(event.endsAt))}</p>}
             {event.organizer && <p>Arrangør: {event.organizer}</p>}
             {hasTicketLink && (
               <p>

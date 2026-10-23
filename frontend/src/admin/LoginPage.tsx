@@ -1,6 +1,7 @@
+import { errorMessage } from '../lib/http'
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { useAuth } from './Auth'
+import { useAuth } from './useAuth'
 
 export default function LoginPage() {
   const auth = useAuth()
@@ -24,7 +25,7 @@ export default function LoginPage() {
           try {
             await auth.login(email, password, rememberMe)
           } catch (reason) {
-            setError(reason instanceof Error ? reason.message : 'Kunne ikke logge inn.')
+            setError(errorMessage(reason, 'Kunne ikke logge inn.'))
           } finally {
             setBusy(false)
           }

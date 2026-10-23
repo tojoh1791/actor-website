@@ -1,3 +1,4 @@
+using static ActorWebsite.Api.Tests.TestRequests;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -41,17 +42,6 @@ public sealed class BookingTests
         if (csrf) request.Headers.Add("X-CSRF-TOKEN", form.GetProperty("csrfToken").GetString());
         return await client.SendAsync(request);
     }
-    private static async Task<HttpResponseMessage> AdminWrite(HttpClient client, HttpMethod method, string path, object? body = null)
-    {
-        var token = await client.GetFromJsonAsync<JsonElement>("/api/auth/csrf");
-        using var request = new HttpRequestMessage(method, path);
-        request.Headers.Add("X-CSRF-TOKEN", token.GetProperty("token").GetString());
-        if (body is not null) request.Content = JsonContent.Create(body);
-        return await client.SendAsync(request);
-    }
-    private static async Task Login(HttpClient client, ApiFactory factory) => Assert.Equal(HttpStatusCode.OK,
-        (await AdminWrite(client, HttpMethod.Post, "/api/auth/login", new { email = ApiFactory.Email, password = factory.Password })).StatusCode);
-
     [Fact]
     public async Task Anonymous_submission_is_private_persistent_idempotent_and_never_creates_an_event()
     {
@@ -96,7 +86,7 @@ public sealed class BookingTests
             Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(url)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.PatchAsJsonAsync(path + "/status", new { status = "agreed" })).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.DeleteAsync(path)).StatusCode);
-        await Login(client, factory);
+        await SignIn(client, factory);
         var summary = await client.GetFromJsonAsync<JsonElement>("/api/admin/bookings/summary");
         Assert.Equal(1, summary.GetProperty("newCount").GetInt32());
         var list = await client.GetFromJsonAsync<JsonElement>("/api/admin/bookings/?status=new");
@@ -109,15 +99,15 @@ public sealed class BookingTests
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PatchAsJsonAsync(path + "/status", new { status = "agreed" })).StatusCode);
         foreach (var status in new[] { "inProgress", "agreed", "declined", "new" })
         {
-            var response = await AdminWrite(client, HttpMethod.Patch, path + "/status", new { status });
+            var response = await Send(client, HttpMethod.Patch, path + "/status", new { status });
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(status, (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("status").GetString());
         }
-        Assert.Equal(HttpStatusCode.BadRequest, (await AdminWrite(client, HttpMethod.Patch, path + "/status", new { status = "published" })).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await Send(client, HttpMethod.Patch, path + "/status", new { status = "published" })).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync("/api/admin/bookings/?status=secret&page=0")).StatusCode);
         Assert.Empty((await client.GetFromJsonAsync<ActorEvent[]>("/api/events"))!);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.DeleteAsync(path)).StatusCode);
-        Assert.Equal(HttpStatusCode.NoContent, (await AdminWrite(client, HttpMethod.Delete, path)).StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, (await Send(client, HttpMethod.Delete, path)).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync(path)).StatusCode);
     }
 
@@ -128,7 +118,7 @@ public sealed class BookingTests
         // its role, which is rechecked by security-stamp validation on every request.
         await using var factory = new ApiFactory();
         using var client = await factory.ReadyClientAsync();
-        await Login(client, factory);
+        await SignIn(client, factory);
         await using (var scope = factory.Services.CreateAsyncScope())
         {
             var users = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>>();
@@ -137,7 +127,7 @@ public sealed class BookingTests
         Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/admin/bookings/")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/admin/bookings/summary")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/admin/bookings/" + Guid.NewGuid() + "/event-draft")).StatusCode);
-        Assert.Equal(HttpStatusCode.Forbidden, (await AdminWrite(client, HttpMethod.Patch, "/api/admin/bookings/" + Guid.NewGuid() + "/status", new { status = "agreed" })).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Send(client, HttpMethod.Patch, "/api/admin/bookings/" + Guid.NewGuid() + "/status", new { status = "agreed" })).StatusCode);
     }
 
     [Fact]
@@ -166,7 +156,7 @@ public sealed class BookingTests
             db.BookingRequests.AddRange(bookings);
             await db.SaveChangesAsync();
         }
-        await Login(client, factory);
+        await SignIn(client, factory);
         foreach (var booking in bookings)
         {
             var response = await client.GetAsync("/api/admin/bookings/" + booking.Id + "/event-draft");
@@ -186,7 +176,7 @@ public sealed class BookingTests
         }
         // A previously valid link must check the current status again on reload.
         var path = "/api/admin/bookings/" + bookings[0].Id;
-        Assert.Equal(HttpStatusCode.OK, (await AdminWrite(client, HttpMethod.Patch, path + "/status", new { status = "declined" })).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await Send(client, HttpMethod.Patch, path + "/status", new { status = "declined" })).StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, (await client.GetAsync(path + "/event-draft")).StatusCode);
         await using var check = factory.Services.CreateAsyncScope();
         Assert.Empty(await check.ServiceProvider.GetRequiredService<ApplicationDbContext>().Events.ToListAsync());
@@ -215,7 +205,7 @@ public sealed class BookingTests
             db.BookingRequests.AddRange(bookings);
             await db.SaveChangesAsync();
         }
-        await Login(client, factory);
+        await SignIn(client, factory);
         foreach (var booking in bookings)
             Assert.Equal(HttpStatusCode.Conflict, (await client.GetAsync("/api/admin/bookings/" + booking.Id + "/event-draft")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/admin/bookings/" + Guid.NewGuid() + "/event-draft")).StatusCode);

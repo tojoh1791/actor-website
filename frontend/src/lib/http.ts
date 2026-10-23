@@ -8,6 +8,10 @@ export class ApiError extends Error {
   }
 }
 
+export function errorMessage(reason: unknown, fallback = 'Handlingen kunne ikke fullføres.') {
+  return reason instanceof Error ? reason.message : fallback
+}
+
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   const method = options.method ?? 'GET'
   const headers = new Headers(options.headers)

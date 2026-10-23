@@ -1,27 +1,10 @@
-import { useEffect, useState } from 'react'
-import { getUpcomingEvents } from '../lib/api'
+import { useApiQuery } from '../hooks/useApiQuery'
 import type { ActorEvent } from '../types/event'
 import EventCard from '../components/EventCard'
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<ActorEvent[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    const controller = new AbortController()
-    getUpcomingEvents(controller.signal)
-      .then(setEvents)
-      .catch((reason: unknown) => {
-        if (!controller.signal.aborted) {
-          setError(reason instanceof Error ? reason.message : 'Noe gikk galt.')
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-    return () => controller.abort()
-  }, [])
+  const { data, loading, error } = useApiQuery<ActorEvent[]>('/api/events')
+  const events = data ?? []
 
   return (
     <section className="page-heading">

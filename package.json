@@ -20,7 +20,8 @@
     "format:check": "npm --prefix frontend run format:check",
     "format:api": "dotnet format whitespace backend --folder --exclude ActorWebsite.Api/Data/Migrations ActorWebsite.Api/bin ActorWebsite.Api/obj ActorWebsite.Api.Tests/bin ActorWebsite.Api.Tests/obj",
     "format:api:check": "npm run format:api -- --verify-no-changes",
-    "check": "npm run build:web && npm run build:api",
+    "check": "npm run format:check && npm run lint:web && npm run test:web && npm run build:web && npm run build:api",
+    "test:web": "npm --prefix frontend test",
     "admin:create": "node --env-file=.env scripts/dotnet.mjs run --project backend/ActorWebsite.Api --no-launch-profile -- --create-admin",
     "admin:reset-password": "node --env-file=.env scripts/dotnet.mjs run --project backend/ActorWebsite.Api --no-launch-profile -- --reset-admin-password",
     "test:api": "node --env-file=.env scripts/test-api.mjs"

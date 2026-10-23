@@ -47,11 +47,7 @@ public sealed class EventImageStore(IHostEnvironment environment, IConfiguration
         {
             // Choose a decoder from the actual file signature, never a client filename
             // or MIME type. Force that decoder so other formats/delegates cannot run.
-            var bytes = buffer.GetBuffer();
-            var format = buffer.Length >= 12 && bytes[0] == 0xff && bytes[1] == 0xd8 && bytes[2] == 0xff ? MagickFormat.Jpeg
-                : buffer.Length >= 12 && bytes.AsSpan(0, 8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }) ? MagickFormat.Png
-                : buffer.Length >= 12 && bytes.AsSpan(0, 4).SequenceEqual("RIFF"u8) && bytes.AsSpan(8, 4).SequenceEqual("WEBP"u8) ? MagickFormat.WebP
-                : throw new ImageUploadException("Velg et JPG-, PNG- eller WebP-bilde.");
+            var format = DetectFormat(buffer.GetBuffer().AsSpan(0, (int)buffer.Length));
             var options = new MagickReadSettings { Format = format, FrameCount = 1 };
             buffer.Position = 0;
             var info = new MagickImageInfo(buffer, options);
@@ -84,7 +80,23 @@ public sealed class EventImageStore(IHostEnvironment environment, IConfiguration
         {
             throw new ImageUploadException("Bildet kunne ikke åpnes. Velg et annet JPG-, PNG- eller WebP-bilde.");
         }
-        finally { processing.Release(); }
+        finally
+        {
+            processing.Release();
+        }
+    }
+
+    private static MagickFormat DetectFormat(ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.Length < 12)
+            throw new ImageUploadException("Velg et JPG-, PNG- eller WebP-bilde.");
+        if (bytes[0] == 0xff && bytes[1] == 0xd8 && bytes[2] == 0xff)
+            return MagickFormat.Jpeg;
+        if (bytes[..8].SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }))
+            return MagickFormat.Png;
+        if (bytes[..4].SequenceEqual("RIFF"u8) && bytes.Slice(8, 4).SequenceEqual("WEBP"u8))
+            return MagickFormat.WebP;
+        throw new ImageUploadException("Velg et JPG-, PNG- eller WebP-bilde.");
     }
 }
 

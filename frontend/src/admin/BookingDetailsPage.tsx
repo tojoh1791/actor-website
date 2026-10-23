@@ -1,61 +1,78 @@
-import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
+import { errorMessage, api } from '../lib/http'
+import { useApiQuery } from '../hooks/useApiQuery'
+import AdminRequestError from './AdminRequestError'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ApiError, api, eventDate } from './api'
-import { bookingDate, bookingStatuses, bookingTypes } from '../types/booking'
+import { eventDate, bookingDate } from '../lib/dateTime'
+import { bookingStatuses, bookingTypes } from '../types/booking'
 import type { BookingDetails } from '../types/booking'
 import ConfirmDialog from './ConfirmDialog'
 
 export default function BookingDetailsPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [item, setItem] = useState<BookingDetails | null>(null)
-  const [status, setStatus] = useState('new')
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
+  const {
+    data: item,
+    loading,
+    error: queryError,
+    errorStatus,
+    reload,
+    setData: setItem,
+  } = useApiQuery<BookingDetails>('/api/admin/bookings/' + id)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const status = selectedStatus ?? item?.status ?? 'new'
+  const loadError =
+    errorStatus === 404 ? 'Forespørselen finnes ikke. Den kan være slettet.' : queryError
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [retry, setRetry] = useState(0)
-  useEffect(() => {
-    let active = true
-    setLoading(true)
-    setLoadError('')
-    api<BookingDetails>('/api/admin/bookings/' + id)
-      .then((value) => {
-        if (active) {
-          setItem(value)
-          setStatus(value.status)
-        }
+  async function saveStatus(event: FormEvent<HTMLFormElement>) {
+    if (!item) return
+    event.preventDefault()
+    if (busy) return
+    setBusy(true)
+    setError('')
+    setNotice('')
+    try {
+      const updated = await api<BookingDetails>('/api/admin/bookings/' + item.id + '/status', {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
       })
-      .catch((reason) => {
-        if (active)
-          setLoadError(
-            reason instanceof ApiError && reason.status === 404
-              ? 'Forespørselen finnes ikke. Den kan være slettet.'
-              : reason instanceof Error
-                ? reason.message
-                : 'Kunne ikke hente forespørselen.',
-          )
-      })
-      .finally(() => {
-        if (active) setLoading(false)
-      })
-    return () => {
-      active = false
+      setItem(updated)
+      setSelectedStatus(null)
+      setNotice('Statusen er lagret. Ingen melding er sendt til arrangøren.')
+    } catch (reason) {
+      setError(errorMessage(reason, 'Kunne ikke lagre statusen.'))
+    } finally {
+      setBusy(false)
     }
-  }, [id, retry])
+  }
+
+  async function deleteBooking() {
+    if (!item || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      await api('/api/admin/bookings/' + item.id, { method: 'DELETE' })
+      navigate('/admin/bookings', {
+        replace: true,
+        state: { notice: 'Forespørselen er slettet.' },
+      })
+    } catch (reason) {
+      setError(errorMessage(reason, 'Kunne ikke slette forespørselen.'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
   if (loading) return <p role="status">Henter forespørselen …</p>
   if (loadError || !item)
     return (
       <section>
         <h1>Forespørsel</h1>
-        <div role="alert" className="admin-error">
-          <p>{loadError}</p>
-          <button className="admin-secondary" onClick={() => setRetry((value) => value + 1)}>
-            Prøv igjen
-          </button>
-        </div>
+        <AdminRequestError message={loadError} onRetry={reload} />
       </section>
     )
   const emailLink =
@@ -134,35 +151,13 @@ export default function BookingDetailsPage() {
           arrangøren.
         </p>
       </article>
-      <form
-        className="admin-card"
-        onSubmit={async (event) => {
-          event.preventDefault()
-          if (busy) return
-          setBusy(true)
-          setError('')
-          setNotice('')
-          try {
-            const updated = await api<BookingDetails>(
-              '/api/admin/bookings/' + item.id + '/status',
-              { method: 'PATCH', body: JSON.stringify({ status }) },
-            )
-            setItem(updated)
-            setStatus(updated.status)
-            setNotice('Statusen er lagret. Ingen melding er sendt til arrangøren.')
-          } catch (reason) {
-            setError(reason instanceof Error ? reason.message : 'Kunne ikke lagre statusen.')
-          } finally {
-            setBusy(false)
-          }
-        }}
-      >
+      <form className="admin-card" onSubmit={saveStatus}>
         <h2>Hold oversikt</h2>
         <label htmlFor="booking-status">Status på forespørselen</label>
         <select
           id="booking-status"
           value={status}
-          onChange={(event) => setStatus(event.target.value)}
+          onChange={(event) => setSelectedStatus(event.target.value)}
           disabled={busy}
         >
           {Object.entries(bookingStatuses).map(([value, label]) => (
@@ -225,23 +220,7 @@ export default function BookingDetailsPage() {
           busy={busy}
           error={error}
           onClose={() => setDeleting(false)}
-          onConfirm={async () => {
-            setBusy(true)
-            setError('')
-            try {
-              await api('/api/admin/bookings/' + item.id, { method: 'DELETE' })
-              navigate('/admin/bookings', {
-                replace: true,
-                state: { notice: 'Forespørselen er slettet.' },
-              })
-            } catch (reason) {
-              setError(
-                reason instanceof Error ? reason.message : 'Kunne ikke slette forespørselen.',
-              )
-            } finally {
-              setBusy(false)
-            }
-          }}
+          onConfirm={deleteBooking}
         />
       )}
     </section>
