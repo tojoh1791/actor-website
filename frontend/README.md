@@ -1,15 +1,16 @@
 # Frontend
 
-React og TypeScript med Vite og React Router. Offentlige ruter: /, /about, /talks, /book, /events og /contact. Kontrollpanelet finnes under /admin og krever administratorinnlogging. Se docs/admin.md i prosjektroten.
+React og TypeScript med Vite og React Router. Se [prosjektets README](../README.md) for komplett oppsett, oppstart og tester og [arkitekturbeskrivelsen](../docs/architecture.md) for ansvarsfordelingen i koden.
 
 Fra prosjektroten:
 
-- Installer: npm --prefix frontend ci
-- Start: npm run dev:web
-- Bygg: npm run build:web
+```sh
+npm --prefix frontend ci
+npm run dev:web
+```
 
-Utviklingsserveren bruker http://localhost:5173 og videresender /api til http://localhost:5080. Se README.md i prosjektroten for database og backend.
+Nettsiden kjører normalt på [http://localhost:5173](http://localhost:5173). /api videresendes til backend på port 5080. Kontrollpanelet finnes på /admin; offentlige sider er /, /about, /talks, /book, /events og /contact.
 
-Arrangementslisten har lasting, feil- og tomtilstand. Detaljene bruker HTML details/summary for innebygd tastaturstøtte. Datoer vises i Europe/Oslo.
+Presentasjonsinnhold og kontaktkanaler ligger i src/content/site.ts. HTTP, feil og norsk datohåndtering ligger i src/lib. Sidene deler innlastingslogikk gjennom src/hooks/useApiQuery.ts. Se [innholdskildene](../docs/content-sources.md) før bilder eller biografi brukes offentlig.
 
-Innhold og fremtidig kontakt/booking konfigureres i src/content/site.ts. Bildefiler ligger i public/images. Kilder og bildeopplysninger er dokumentert i docs/content-sources.md i prosjektroten.
+Kjør **npm run lint:web**, **npm run test:web**, **npm run build:web** og **npm run format:check** fra prosjektroten for kontroller. **npm run format** retter formateringen.

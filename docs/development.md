@@ -1,58 +1,62 @@
-# Utviklingsstatus og neste steg
+# Utviklingsstatus og testing
 
-## Satt opp
+## Implementert
 
-- React/TypeScript med Vite, React Router og låste installasjoner gjennom package-lock.json.
-- ASP.NET Core på .NET 10 med pakkelåser, PostgreSQL-provider og lokalt dotnet-ef-verktøy.
-- Databasemodeller for arrangementer og Identity-brukere, og første EF-migrering.
-- API for publiserte kommende arrangementer, livstegn og databaseberedskap.
-- Offentlige sider med plassholderinnhold, mobiltilpasset grunnlayout og utvidbare arrangementskort.
-- Lokal database i Docker, ignorert lokal konfigurasjon og oppstartsveiledning.
-- GitHub Actions for bygg av frontend og backend.
+Prototypen har offentlige presentasjonssider, arrangementer, bookingskjema, administratorinnlogging, privat forespørselsinnboks og administrasjon av arrangementer. Avtalte bookinger kan brukes til å forhåndsutfylle et arrangement, med unntak for skuespilleroppdrag. Status eller innsending publiserer aldri noe automatisk.
 
-## Avgrensning
+Oppstart og tilgjengelige kommandoer finnes i [README](../README.md). [Arkitekturbeskrivelsen](architecture.md) forklarer hvor de ulike delene av koden ligger. Dette dokumentet erstatter den gamle statuslisten fra første prosjektoppsett.
 
-Dette oppsettet er et grunnlag, ikke en ferdig innlevering. Innlogging, administratoropprettelse og administrasjon av arrangementer gjenstår. Ingen brukere eller arrangementer er forhåndsutfylt. Endelig biografi, bilder og kontaktinformasjon må avklares.
+## Kodeoppryddingen
 
-## Foreslått neste arbeidsøkt
+- Felles GET-hook erstatter gjentatt innlasting, feilbehandling og avbryting i sidene.
+- Felles HTTP-klient og datohjelpere erstatter parallelle implementeringer.
+- Arrangementets innlasting og redigeringsskjema har hver sin komponent.
+- Datakontrakter og validering er flyttet ut av rutefilene i backend.
+- Innloggings-/CSRF-hjelpere er samlet for integrasjonstestene.
+- Ubrukt kontaktlayout er fjernet fra CSS. Stylesheetene har tydelige seksjonskommentarer.
+- Prettier, C#-formatering og kodekontroll gjør samme stil mulig i videre utvikling.
 
-1. Fastsett valideringsregler og regler for arrangementenes start/slutt og publisering.
-2. Implementer én administrator og sikker innlogging/utlogging uten offentlig registrering.
-3. Implementer beskyttet oppretting, redigering, sletting og publisering/avpublisering.
-4. Bygg administrasjonsgrensesnittet og test hele flyten mot PostgreSQL.
-5. Legg inn avklart presentasjonsinnhold og lag demonstrasjonen.
+## Automatisert verifikasjon
 
-## Tekniske beslutninger i grunnoppsettet
+Kjør **npm run check**, **npm run test:api** og **npm run format:api:check** fra prosjektroten. Databasen må kjøre for integrasjonstestene.
 
-- Vite er valgt som frontend-oppsett. React Router håndterer rutene.
-- Frontend og API bruker /api gjennom utviklingsproxy. Produksjonsruting må konfigureres ved publisering.
-- PostgreSQL lagrer tidspunkt som timestamptz. Verdier skal skrives i UTC; frontend viser Europe/Oslo.
-- Kommende arrangementer betyr foreløpig publisert og starttidspunkt større enn eller lik nå.
-- Arrangementskort viser dato, tittel, sted og utvidbare detaljer. Eksterne lenker og bilder vises først etter at validering og innhold er implementert.
-- Administratordata bruker Identity-tabeller. Det finnes ingen åpen registreringsrute.
-- PostgreSQL eksponeres bare på lokal maskin. Datavolumet beholdes når databasen stoppes.
+Frontend-testene kontrollerer vintertid, sommertid, tvetydige og ikke-eksisterende klokkeslett og riktig kalenderdato i Oslo. De krever ikke database.
 
-## Manuelle akseptansescenarioer når administrasjon er implementert
+Integrasjonstestene dekker innlogging, cookie, roller, CSRF, kontolås, ratebegrensning, arrangementer, opplasting og kontroll av bilder, privat booking, gjentatt innsending, filtrering, statuser, sletting og reglene for forhåndsutfylling. Hver test bruker sin egen database og rydder opp etter seg. Applikasjonsdatabasen skal aldri brukes til testdata.
 
-- Opprett et upublisert arrangement: det skal ikke vises offentlig.
-- Publiser det: det skal vises på riktig plass i listen.
-- Rediger og avpubliser: endringene skal vises og arrangementet skal deretter skjules.
-- Start applikasjonen på nytt: lagrede data skal finnes fortsatt.
-- Forsøk ugyldige tidspunkt og manglende felter: API og skjema skal forklare feilen.
-- Forsøk endring uten innlogging: API skal avvise forespørselen.
-- Test mobilbredde og naviger med tastatur.
+Dokumenter faktiske resultater fra hver kjøring. Et bygg som viser NU1900 kan ha lykkes selv om NuGets sårbarhetskontroll ikke kunne hentes. Dette er to separate kontroller.
 
-Dokumenter faktiske resultater og KI-støttede forbedringer etter hvert; ikke marker disse scenarioene som bestått før funksjonene finnes og er testet.
+## Manuell kontroll før demonstrasjon
 
-## Verifisering ved oppsett (22. oktober 2026)
+1. Kontroller offentlige sider på mobil og større skjerm, inkludert åpning/lukking av mobilmenyen.
+2. Send en booking og kontroller mottaksreferanse og at innsendingen ikke oppretter et arrangement.
+3. Logg inn, filtrer innboksen, åpne forespørselen og lagre «Avtalt».
+4. Åpne det forhåndsutfylte arrangementet. Kontroller at privat melding og kontaktopplysninger ikke er kopiert.
+5. Fyll inn tid og adresse, velg bilde og forhåndsvis. Lagre som utkast og kontroller at det fortsatt er privat.
+6. Åpne utkastet, publiser det og kontroller tittel, tid, bilde og detaljer offentlig.
+7. Skjul arrangementet igjen, og kontroller at det forsvinner fra den offentlige listen.
+8. Kontroller at skuespilleroppdrag ikke får opprett-knapp, og at en direkte lenke avvises.
+9. Prøv et manglende arrangement, nytt forsøk etter feil, avbryt-knapper, utlogging og tilgang uten innlogging.
+10. Start applikasjonen på nytt og kontroller at lagrede data fortsatt finnes.
 
-- Frontend-produksjonsbygg: bestått.
-- Backend-bygg i Debug og Release: bestått, uten advarsler eller feil.
-- .NET-gjenoppretting med locked-mode: bestått.
-- EF-modell og første migrering samsvarer; SQL-skript for tabellene er generert.
-- HTTP-kontroll av forside, om-side, API-livstegn, utviklingsproxy og OpenAPI: bestått.
-- Docker Compose-konfigurasjon: validert.
-- Database: ikke startet. Docker Desktop-motoren kom ikke i gang i oppsettsøkten. Migreringen er derfor ikke brukt på PostgreSQL, og arrangementslisten er ikke verifisert mot en kjørende database.
-- Readiness-endepunktet returnerte forventet 503 uten database.
+## Bruk av KI i oppgaven
 
-Start Docker Desktop og kjør npm run db:up og npm run db:migrate for å fullføre lokal databaseinitialisering. Start deretter API og frontend som beskrevet i README.
+KI er brukt til idéarbeid, planlegging, utvikling, testing og opprydding i dialog med studenten. Konkrete forbedringer fra arbeidet er like store arrangementskort, enklere mobilnavigasjon, tydelige tilbakeknapper og forhåndsutfylling fra booking med skjerming av private opplysninger.
+
+Til innleveringen bør studenten vise den fungerende arbeidsflyten og forklare egne valg, hva KI bidro med og hvilke feil og forbedringer testingen avdekket. En kort beskrivelse og demo følger oppgaveteksten; en produksjonslansering er ikke nødvendig for å vise prototypen.
+
+## Videre arbeid før offentlig drift
+
+Vert, HTTPS, proxy, varig nøkkel-/bildelagring, sikkerhetskopiering og gjenoppretting må konfigureres og testes. Endelige kontakt- og foretaksopplysninger og bildebruksrett må avklares. E-postvarsler, to-faktorinnlogging, betaling og automatisk bildeopprydding er ikke implementert.
+
+Booking og arrangement er selvstendige poster etter forhåndsutfylling. Det finnes foreløpig ingen varig kobling eller sperre mot å opprette flere arrangementer fra samme booking. Senere endringer gjøres i det allerede opprettede arrangementet.
+
+## Verifisert etter kodeoppryddingen, 23. oktober 2026
+
+- Samlekontrollen bestod: formatering, kodekontroll uten advarsler, tre datotester og bygg av frontend og backend.
+- Alle 27 integrasjonstester bestod mot separate testdatabaser. C#-formateringen bestod også kontrollen.
+- Nettlesertest bekreftet innsending og mottaksreferanse, innlogging, statuslagring, forhåndsutfylling uten privat melding, bildevalg og opplasting, privat utkast, gjenåpning med beholdt bilde/tid og eksplisitt publisering.
+- Offentlige kort hadde lik høyde i sammenfoldet visning, én kolonne på mobil og to på større skjerm. Utviding av detaljer, skjuling, feilmelding med nytt forsøk og utlogging/avvisning uten innlogging fungerte.
+- NuGets sårbarhetskontroll var utilgjengelig og ga NU1900. Byggene og testene bestod; pakkesårbarhetskontrollen kunne ikke bekreftes.
+
+Nettlesertesten brukte egen testkonto, midlertidig database og separat bildelager. Ingen faktiske bookingforespørsler ble opprettet i applikasjonsdatabasen.

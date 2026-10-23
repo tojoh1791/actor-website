@@ -1,23 +1,17 @@
 # Backend
 
-ASP.NET Core API i ActorWebsite.Api med EF Core, Npgsql og ASP.NET Core Identity.
+ASP.NET Core Minimal API med Entity Framework Core, Npgsql og ASP.NET Core Identity. Se [prosjektets README](../README.md) for komplett oppsett og [arkitekturbeskrivelsen](../docs/architecture.md) for kodekonvensjoner.
 
-Fra prosjektroten:
+Endpoints beskriver rutene og arbeidsflytene. Contracts inneholder API-felter og validering, mens Models og Data beskriver lagringen. Security håndterer innlogging, tilgang og spamvern. Services/EventImageStore.cs validerer og lagrer bilder.
 
-- Installer: dotnet restore ActorWebsite.slnx
-- Installer EF-verktøy: npm run tools:restore
-- Generer lokal konfigurasjon: npm run init:local
-- Start PostgreSQL: npm run db:up
-- Opprett/oppdater schema: npm run db:migrate
-- Start API: npm run dev:api
-- Bygg: npm run build:api
+API-et kjører normalt på [http://localhost:5080](http://localhost:5080). Start med **npm run dev:api** fra prosjektroten. Skriptet laster den ignorerte .env; tilkoblingshemmeligheter legges ikke i appsettings.
 
-API-et bruker http://localhost:5080. API- og migreringsskriptene laster .env fra prosjektroten. Ingen tilkoblingshemmeligheter ligger i appsettings-filene.
+Databaseoppdateringer kjøres eksplisitt med **npm run db:migrate**. Ved en ny modellendring kan en migrering opprettes med:
 
-Administratorinnlogging med Identity-cookie, Administrator-rolle, CSRF-beskyttelse og beskyttede arrangementsendepunkter er implementert. Opprett kontoen med npm run admin:create. Se docs/admin.md i prosjektroten for bruk, passordgjenoppretting og sikkerhetsdetaljer.
+```sh
+dotnet ef migrations add Navn --project backend/ActorWebsite.Api --output-dir Data/Migrations
+```
 
-Opprett ny migrering fra prosjektroten med:
+Bruk **npm run build:api**, **npm run test:api** og **npm run format:api:check** for kontroller. Integrasjonstestene krever PostgreSQL og lager egne midlertidige databaser; se [README](../README.md#bygg-tester-og-kodekvalitet).
 
-    dotnet ef migrations add Navn --project backend/ActorWebsite.Api --output-dir Data/Migrations
-
-Bruk npm run db:migrate til å bruke migreringen på lokal database. Migreringer kjøres eksplisitt og ikke automatisk ved oppstart.
+Administratorkonto opprettes i en interaktiv terminal med **npm run admin:create**. Se [administrasjonsveiledningen](../docs/admin.md) for passordgjenoppretting, tilgangskrav og lagring.

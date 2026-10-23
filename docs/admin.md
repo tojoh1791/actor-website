@@ -60,25 +60,12 @@ Ingen databasemigrering kreves: eksisterende imageUrl-felt brukes. Start API-et 
 
 Dette er et lokalt utviklingsoppsett. Før offentlig drift må HTTPS, betrodd reverse proxy, varig og beskyttet lagring av Data Protection-nøkler, sikkerhetskopiering/gjenoppretting og feilovervåking konfigureres for valgt vert. Limiterens IP-adresse må være korrekt når appen kjører bak en proxy. To-faktorinnlogging er ikke implementert.
 
-## Tester
+## Tester og videre dokumentasjon
 
-Kjør npm run test:api med lokal PostgreSQL startet. Testkontoen må kunne opprette egne testdatabaser. Bruk aldri produksjonslegitimasjon til tester.
+Kjør npm run test:api med en kjørende PostgreSQL. Testene bruker de faktiske migreringene, egne midlertidige databaser og egne bildemapper. De dekker innlogging, roller, CSRF, kontolås, cookies, utlogging, validering, arrangementer, bilder og booking. Testdata legges ikke i applikasjonsdatabasen. Se [README](../README.md) for oppstart og kommandoer.
 
-Hver test oppretter en egen PostgreSQL-database med et tilfeldig actor_tests_-navn, bruker de faktiske EF-migreringene og fjerner databasen ved avslutning. Applikasjonsdatabasen brukes ikke til testdata. ACTOR_TEST_POSTGRES kan overstyre tilkoblingen for et eget testmiljø.
+Frontend-testene kontrollerer blant annet norsk tid og overganger mellom sommer- og vintertid. Kjør npm run test:web. Kodekontroll og bygg kjøres med npm run check.
 
-Testene dekker avvisning uten innlogging, rollekrav, manglende/fremmed CSRF-token, kontolås og begrensning av forsøk, cookieinnstillinger, ugyldiggjøring ved utlogging, validering, offentlig filtrering og flyten opprette/redigere/publisere/skjule/slette. Samme tester kjøres i GitHub Actions med PostgreSQL.
+Se [booking.md](booking.md) for forespørselsinnboksen og overgang fra avtalt booking til arrangement, og [development.md](development.md) for utviklingsstatus og manuelle testscenarioer.
 
-Bildeoppdateringen har 17 beståtte integrasjonstester totalt, inkludert alle tre bildeformater, uthenting uten innlogging, størrelsestilpasning, fjerning av metadata, lagring/publisering av bildevalg, tilbakegang til standardbilde og avvisning av ugyldige filer, for store filer og ugyldige bildereferanser. Bildetestene bruker egne midlertidige mapper som fjernes etter kjøringen. Frontend og backend bygger. NuGets automatiske sårbarhetssjekk svarte ikke under denne oppdateringen (NU1900), så den sjekken kunne ikke bekreftes.
-
-Nettleserkontroll i separat testdatabase: filvelger, forhåndsvisning, opplasting og lagring, gjenåpning med beholdt bilde, offentlig visning og bytte tilbake til standardbilde er kontrollert. Smal mobilvisning hadde én kolonne uten horisontal overflyt; større skjerm hadde to kolonner. Begge bilder lastet. Egne bilder vises i sin helhet, slik at plakater og bokomslag ikke beskjæres. Portrettet som brukes som standard fyller bildeflaten.
-
-Et avbrutt testprogram kan etterlate egne actor_tests_-databaser. Fjern bare databaser som er bekreftet å tilhøre en avsluttet testkjøring. Testverktøyet sletter aldri applikasjonsdatabasen.
-
-Bookingskjema og forespørselsinnboks er nå implementert; se [booking.md](booking.md) for arbeidsflyt, oppstart og avgrensninger. Google-innlogging og automatisk passordgjenoppretting med e-post er ikke implementert.
-
-## Verifisert ved implementering
-
-- Frontend og backend bygger uten feil eller advarsler; .NET-pakkelås og EF-modell er kontrollert.
-- Alle 11 integrasjonstester bestod mot PostgreSQL.
-- Nettlesertest med en separat, midlertidig konto og egen database: innlogging, mobilvisning, forhåndsvisning, publisering, offentlig visning, skjuling og avbryting av sletting er kontrollert.
-- Den interaktive terminaltesten for kontooppretting ble stoppet av den automatiske godkjenningskontrollen før e-post eller passord ble skrevet inn. Kontokommandoene bygger, men hele terminaldialogen er derfor ikke verifisert i denne økten. Opprett den faktiske kontoen manuelt med npm run admin:create.
+Et avbrutt testprogram kan etterlate en actor_tests_-database. Fjern bare databaser som er bekreftet å tilhøre en avsluttet testkjøring. Testverktøyet sletter aldri applikasjonsdatabasen.

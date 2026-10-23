@@ -40,12 +40,6 @@ Dette reduserer enkle spamforsøk, men verifiserer ikke avsenderens e-post og st
 
 ## Verifikasjon
 
-Alle 25 integrasjonstester bestod mot egne, midlertidige PostgreSQL-databaser. Testene omfatter eksisterende innlogging og arrangementsfunksjoner, samt privat og idempotent innsending, statusendringer, filtrering, sletting, avvisning uten riktig tilgang, CSRF, ugyldige felt, lokkefelt, tidsgrense og ratebegrensning. Applikasjonsdatabasen brukes ikke til testdata.
+Integrasjonstestene dekker privat og idempotent innsending, statusendringer, filtrering, sletting, tilgangskontroll, CSRF, feltvalidering, lokkefelt, tidsgrense og ratebegrensning. Forhåndsutfylling kontrolleres for alle tillatte typer, avvisning av skuespilleroppdrag og ikke-avtalte bookinger, manglende dato/organisasjon, skjerming av private opplysninger og at åpning ikke oppretter arrangementer. Uthenting etter endring fra «Avtalt» avvises.
 
-Oppdateringen for forhåndsutfylling har 27 verifiserte integrasjonstester totalt. De to nye testene kontrollerer tillatte oppdragstyper, avvisning av skuespilleroppdrag og ikke-avtalte bookinger, tilgangskontroll, feltutvalg uten private kontaktopplysninger eller melding, manglende dato/organisasjon og at åpning ikke oppretter arrangementer. Ny uthenting etter endring fra «Avtalt» avvises. Testen for cachebeskyttelse kontrollerer `NoStore`-egenskapen, siden rammeverket også kan legge til `no-cache`.
-
-Separat nettlesertest bekrefter mobilvisning, skjult opprett-knapp for skuespilleroppdrag, avvisning via direkte lenke, synlig knapp først etter lagret «Avtalt», forhåndsutfylte felt etter oppfriskning, booking uten ønsket dato, lagring som privat utkast, gjenåpning med beholdt norsk tidspunkt og eksplisitt publisering uten privat melding. Vanlig manuell oppretting starter fortsatt med tomt skjema. Alle testdata lå i en separat testdatabase.
-
-Frontend og backend bygger. Ingen nye biblioteker er lagt til for bookingfunksjonen. NuGets automatiske sårbarhetssjekk var utilgjengelig i miljøet (NU1900); den kunne derfor ikke bekreftes. Migreringen er generert og kjørt med et allerede installert EF-verktøy 10.0.12 mot runtime 10.0.13. Kontrollen av ventende modellendringer bekrefter at runtime-modell og migrering samsvarer.
-
-Nettleserkontroll med egen testkonto og separat database bekrefter innsending fra det offentlige skjemaet, mottakskvittering, teller for nye forespørsler, innboks og detaljvisning, lagret statusendring og statusfiltre. Mobilvisningen ved omtrent 385 CSS-pikslers bredde har ingen horisontal overflyt. E-postlenken er kontrollert uten å sende e-post. Testdata legges ikke i applikasjonsdatabasen.
+Testene bruker egne midlertidige PostgreSQL-databaser. Se [README](../README.md) for kommandoer og [development.md](development.md) for manuelle kontroller og resultater fra kodeoppryddingen.
