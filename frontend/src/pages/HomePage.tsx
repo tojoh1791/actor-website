@@ -10,9 +10,8 @@ export default function HomePage() {
         <p className="eyebrow"><span className="small-line" /> Skuespiller og foredragsholder</p>
         <h1 id="home-title">Arben<br /><em>Bala.</em></h1>
         <p className="hero-intro">Fra lerretet til møtet med publikum.</p>
-        <p>Du kjenner ham kanskje fra <i>Jordbrukerne</i> eller <i>Pørni</i>. Gjennom skuespill og foredrag deler Arben historier om mennesker, tilhørighet og veier videre.</p>
-        <div className="actions"><Link className="button" to="/events">Se arrangementer <span aria-hidden="true">↗</span></Link><Link className="text-link" to="/talks">Om foredraget <span aria-hidden="true">→</span></Link></div>
-        <p className="hero-footnote">På skjermen. På scenen. I samtalen.</p>
+        <p>Skuespiller kjent fra <i>Jordbrukerne</i> og <i>Pørni</i>. Foredrag om tilhørighet, valg og veier videre.</p>
+        <div className="actions"><Link className="button" to="/events">Se arrangementer <span aria-hidden="true">↗</span></Link><BookingLink className="text-link" /></div>
       </div>
       <Portrait priority />
     </section>

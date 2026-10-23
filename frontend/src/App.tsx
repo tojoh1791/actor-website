@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import BookingLink from './components/BookingLink'
+import SiteHeader from './components/SiteHeader'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import TalksPage from './pages/TalksPage'
@@ -38,7 +39,7 @@ export default function App() {
   return <>
     <PageNavigation />
     <a className="skip-link" href="#main">Hopp til innhold</a>
-    <header className="site-header"><Link className="brand" to="/" aria-label="Arben Bala – forsiden">Arben Bala<span className="brand-dot">.</span></Link><nav aria-label="Hovedmeny"><NavLink to="/about">Om Arben</NavLink><NavLink to="/talks">Foredrag</NavLink><NavLink to="/book">Boken</NavLink><NavLink to="/events">Arrangementer</NavLink><NavLink className="nav-contact" to="/contact">Kontakt og booking <span aria-hidden="true">↗</span></NavLink></nav></header>
+    <SiteHeader key={pathname} />
     <main id="main" tabIndex={-1}><Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<AboutPage />} />

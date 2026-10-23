@@ -22,6 +22,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible { outline: 3px soli
 main:focus { outline: none; }
 .site-header, main, .site-footer { width: min(100% - 96px, 1200px); margin-inline: auto; }
 .site-header { min-height: 110px; display: flex; align-items: center; justify-content: space-between; gap: 30px; border-bottom: 1px solid var(--border); }
+.site-menu-toggle { display: none; }
 .brand { white-space: nowrap; font-family: Georgia, serif; font-weight: 600; font-size: 1.9rem; letter-spacing: -.06em; text-decoration: none; }
 .brand-dot { color: var(--accent); }
 nav { display: flex; align-items: center; flex-wrap: wrap; gap: 26px; font-size: .9rem; }
@@ -44,8 +45,7 @@ p { max-width: 65ch; margin: 0 0 20px; }
 .hero h1 { font-size: clamp(5rem, 9.5vw, 9rem); line-height: .96; margin: 34px 0; }
 .hero h1 em { font-style: italic; }
 .hero-intro { font-size: 1.35rem; line-height: 1.4; }
-.hero-copy > p:not(.eyebrow, .hero-intro, .hero-footnote) { max-width: 46ch; color: var(--muted); }
-.hero-footnote { color: var(--muted); font-size: .75rem; letter-spacing: .02em; margin: 38px 0 0; }
+.hero-copy > p:not(.eyebrow, .hero-intro) { max-width: 46ch; color: var(--muted); }
 .portrait img { width: 100%; aspect-ratio: 3 / 3.8; object-fit: cover; object-position: 50% 33%; background: #182524; }
 .portrait figcaption { text-align: right; font-size: .65rem; color: var(--muted); padding-top: 8px; }
 .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 30px; }
@@ -180,7 +180,6 @@ summary strong, summary span { margin-left: 20px; }
   .hero { gap: 5%; }
   .hero-copy { padding-block: 10px; }
   .hero .actions { gap: 18px; }
-  .hero-footnote { margin-top: 24px; }
   .page-split { gap: 5%; }
   .invitation { align-items: flex-start; flex-direction: column; gap: 15px; }
   .invitation .actions { flex-direction: row; align-items: center; }
@@ -191,7 +190,13 @@ summary strong, summary span { margin-left: 20px; }
   .booking-field-row { gap: 0; }
   .event-list { grid-template-columns: 1fr; }
   .site-header, main, .site-footer { width: calc(100% - 40px); }
-  .site-header { padding-block: 18px; gap: 10px; }
+  .site-header { min-height: 84px; padding-block: 16px; gap: 10px; }
+  .site-menu-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--ink); cursor: pointer; }
+  .site-menu-toggle span { font-size: 1.15rem; line-height: 1; }
+  .site-header nav { display: none; width: 100%; padding-top: 10px; border-top: 1px solid var(--border); }
+  .site-header nav.is-open { display: flex; align-items: stretch; flex-direction: column; gap: 0; }
+  .site-header nav a { display: flex; align-items: center; min-height: 48px; padding: 10px 0; font-size: .95rem; }
+  .site-header nav .nav-contact { border-top: 1px solid var(--border); color: var(--accent); }
   .brand { font-size: 1.65rem; }
   nav { gap: 4px 18px; font-size: .8rem; }
   nav .nav-contact { padding: 6px 0; border: 0; }
@@ -201,7 +206,6 @@ summary strong, summary span { margin-left: 20px; }
   .hero h1 { font-size: clamp(5.2rem, 20vw, 7.5rem); margin: 22px 0; }
   .hero-intro { font-size: 1.2rem; }
   .hero .portrait img { aspect-ratio: 4 / 4.3; object-position: 50% 28%; }
-  .hero-footnote { margin-top: 28px; }
   .eyebrow { letter-spacing: .12em; }
   .credits-strip { margin-top: 28px; gap: 18px; align-items: flex-start; flex-direction: column; }
   .credits-strip > div { gap: 12px 26px; font-size: 1.2rem; }
