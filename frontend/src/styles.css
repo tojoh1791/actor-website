@@ -84,6 +84,9 @@ nav {
   font-size: 0.9rem;
 }
 nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
   text-decoration: none;
   padding-block: 8px;
 }
@@ -92,9 +95,13 @@ nav a[aria-current='page'] {
   text-decoration-thickness: 2px;
 }
 nav .nav-contact {
-  border: 1px solid var(--border);
-  padding: 9px 16px;
+  background: var(--accent);
+  color: white;
+  padding-inline: 16px;
   border-radius: 3px;
+}
+nav .nav-contact:hover {
+  background: var(--accent-hover);
 }
 .nav-contact span {
   margin-left: 12px;
@@ -919,8 +926,7 @@ summary span {
     font-size: 0.95rem;
   }
   .site-header nav .nav-contact {
-    border-top: 1px solid var(--border);
-    color: var(--accent);
+    padding-inline: 16px;
   }
   .brand {
     font-size: 1.65rem;
@@ -928,10 +934,6 @@ summary span {
   nav {
     gap: 4px 18px;
     font-size: 0.8rem;
-  }
-  nav .nav-contact {
-    padding: 6px 0;
-    border: 0;
   }
   .nav-contact span {
     margin-left: 2px;

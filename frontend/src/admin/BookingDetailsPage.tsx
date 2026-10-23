@@ -170,7 +170,7 @@ export default function BookingDetailsPage() {
           Bruk «Avtalt» når du og arrangøren har bekreftet avtalen. Statusen er intern og sender
           ingen melding.
         </p>
-        <button className="admin-primary" type="submit" disabled={busy || status === item.status}>
+        <button className="admin-primary" type="submit" disabled={busy} aria-busy={busy}>
           {busy ? 'Lagrer …' : 'Lagre status'}
         </button>
       </form>
