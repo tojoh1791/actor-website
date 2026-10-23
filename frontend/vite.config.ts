@@ -6,6 +6,6 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    proxy: { '/api': 'http://localhost:5080' },
+    proxy: { '/api': process.env.ACTOR_API_TARGET ?? 'http://localhost:5080' },
   },
 })

@@ -6,7 +6,7 @@ Nettside for en skuespiller, med kommende arrangementer og planlagt administrasj
 
 Prosjektgrunnlaget er satt opp. Frontend har offentlige sider og henter kommende arrangementer fra API-et. Backend har PostgreSQL-tilkobling, arrangementsmodell, Identity-datamodell og første databasemigrering.
 
-Innlogging, administratoropprettelse og oppretting/redigering/sletting/publisering av arrangementer er **ikke implementert ennå**. Nettsiden har kildebasert informasjon om Arben Bala, foredraget Uten frykt og romanen Balkanbrødre, med portrett og bokomslag. Kontakt- og bookingkanal er ikke valgt ennå. Ingen demoarrangementer eller brukere opprettes automatisk.
+Administratorinnlogging og et mobiltilpasset kontrollpanel er implementert: oppretting, redigering, forhåndsvisning, utkast, publisering, skjuling og sletting av arrangementer. Kjør npm run admin:create for å opprette den eneste administratorkontoen, og åpne /admin. Se docs/admin.md for oppsett, sikkerhet og tester. Nettsiden har kildebasert informasjon om Arben Bala, foredraget Uten frykt og romanen Balkanbrødre, med portrett og bokomslag. Kontakt- og bookingkanal er ikke valgt ennå. Ingen demoarrangementer eller brukere opprettes automatisk.
 
 ## Teknologi
 
@@ -55,7 +55,7 @@ Hvis du kjører backend direkte med dotnet, må du selv sette ConnectionStrings_
 - http://localhost:5080/api/events returnerer publiserte arrangementer med starttidspunkt i fremtiden, sortert etter start. En ny database gir en tom liste.
 - http://localhost:5080/openapi/v1.json viser API-beskrivelsen i utviklingsmiljøet.
 
-Prosjektet inkluderer også en HTTP-fil med eksempelspørringer og en GitHub Actions-arbeidsflyt som bygger begge delene. Automatiserte funksjonstester legges til når administrasjonsflyten implementeres.
+Prosjektet inkluderer også en HTTP-fil med eksempelspørringer og en GitHub Actions-arbeidsflyt som bygger begge delene. Kjør npm run test:api for automatiserte integrasjonstester mot egne, midlertidige PostgreSQL-databaser.
 
 ## Stoppe
 
@@ -68,6 +68,6 @@ Stopp utviklingsserverne med Ctrl+C. `npm run db:stop` stopper databasen og beho
 - Arrangementer kan ikke lastes: sjekk API, readiness-endepunktet og at db:migrate er kjørt.
 - Endret databasepassord: PostgreSQL bruker passordet fra da volumet ble initialisert. Å endre .env oppdaterer ikke passordet i en eksisterende database.
 
-Dette er et lokalt utviklingsoppsett. Produksjonspublisering, HTTPS, administratorflyt og produksjonskonfigurasjon kommer senere.
+Dette er et lokalt utviklingsoppsett. Produksjonspublisering, HTTPS og produksjonskonfigurasjon kommer senere. Administratorflyten er tilgjengelig på /admin.
 
 Se docs/ for prosjektplanen og docs/development.md for videre arbeid.

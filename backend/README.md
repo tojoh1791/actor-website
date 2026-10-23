@@ -14,7 +14,7 @@ Fra prosjektroten:
 
 API-et bruker http://localhost:5080. API- og migreringsskriptene laster .env fra prosjektroten. Ingen tilkoblingshemmeligheter ligger i appsettings-filene.
 
-Identity-tabeller og autentiseringstjenester er forberedt. Ingen administrator, innloggingsendepunkt eller skriveendepunkter finnes ennå. Ikke bruk plassholdersidene som bevis på fungerende administrasjon.
+Administratorinnlogging med Identity-cookie, Administrator-rolle, CSRF-beskyttelse og beskyttede arrangementsendepunkter er implementert. Opprett kontoen med npm run admin:create. Se docs/admin.md i prosjektroten for bruk, passordgjenoppretting og sikkerhetsdetaljer.
 
 Opprett ny migrering fra prosjektroten med:
 

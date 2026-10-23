@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getUpcomingEvents } from '../lib/api'
 import type { ActorEvent } from '../types/event'
-
-const dateFormat = new Intl.DateTimeFormat('nb-NO', {
-  dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Oslo',
-})
+import EventCard from '../components/EventCard'
 
 export default function EventsPage() {
   const [events, setEvents] = useState<ActorEvent[]>([])
@@ -31,9 +28,6 @@ export default function EventsPage() {
     {loading && <p role="status">Henter arrangementer …</p>}
     {error && <p role="alert">{error}</p>}
     {!loading && !error && events.length === 0 && <div className="event-status"><h2>Nye møter kommer.</h2><p>Det er ingen publiserte arrangementer akkurat nå. Tid, sted og praktisk informasjon legges ut her når nye datoer er klare.</p></div>}
-    <div className="event-list">{events.map(event => <details key={event.id}>
-      <summary><time dateTime={event.startsAt}>{dateFormat.format(new Date(event.startsAt))}</time><strong>{event.title}</strong><span>{event.location}</span></summary>
-      <div className="event-description"><p>{event.description}</p><p>{event.address}</p>{event.organizer && <p>Arrangør: {event.organizer}</p>}</div>
-    </details>)}</div>
+    <div className="event-list">{events.map(event => <EventCard event={event} key={event.id} />)}</div>
   </section>
 }

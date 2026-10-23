@@ -5,11 +5,11 @@ export interface ContactSettings {
 }
 
 // Fill in only the channels agreed with Arben. null keeps them hidden in the UI.
-// bookingUrl supports an external booking service or a future local form route.
+// The contact page contains the booking form; company details can be added later.
 export const contactSettings: ContactSettings = {
   email: null,
   phone: null,
-  bookingUrl: null,
+  bookingUrl: '/contact',
 }
 
 export const site = {

@@ -1,6 +1,6 @@
 # Frontend
 
-React og TypeScript med Vite og React Router. Offentlige ruter: /, /about, /talks, /book, /events og /contact. /admin og /admin/login er foreløpig plassholdere.
+React og TypeScript med Vite og React Router. Offentlige ruter: /, /about, /talks, /book, /events og /contact. Kontrollpanelet finnes under /admin og krever administratorinnlogging. Se docs/admin.md i prosjektroten.
 
 Fra prosjektroten:
 

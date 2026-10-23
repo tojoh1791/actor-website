@@ -7,6 +7,7 @@ import TalksPage from './pages/TalksPage'
 import BookPage from './pages/BookPage'
 import ContactPage from './pages/ContactPage'
 import EventsPage from './pages/EventsPage'
+import AdminApp from './admin/AdminApp'
 
 const pageTitles: Record<string, string> = {
   '/': 'Arben Bala | Skuespiller og foredragsholder',
@@ -17,12 +18,13 @@ const pageTitles: Record<string, string> = {
   '/contact': 'Kontakt og booking | Arben Bala',
   '/admin': 'Administrasjon | Arben Bala',
   '/admin/login': 'Innlogging | Arben Bala',
+  '/admin/bookings': 'Forespørsler | Arben Bala',
 }
 
 function PageNavigation() {
   const { pathname } = useLocation()
   useEffect(() => {
-    document.title = pageTitles[pathname] ?? 'Siden finnes ikke | Arben Bala'
+    document.title = pageTitles[pathname] ?? (pathname.startsWith('/admin/') ? 'Kontrollpanel | Arben Bala' : 'Siden finnes ikke | Arben Bala')
     window.scrollTo({ top: 0, behavior: 'instant' })
     // Move focus after route changes so keyboard users reach the new content.
     document.getElementById('main')?.focus({ preventScroll: true })
@@ -30,11 +32,9 @@ function PageNavigation() {
   return null
 }
 
-function AdminPage() {
-  return <section className="page-heading"><p className="eyebrow">Administrasjon</p><h1>Administrasjon</h1><p>Innlogging og administrasjon av arrangementer utvikles i neste steg.</p></section>
-}
-
 export default function App() {
+  const { pathname } = useLocation()
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return <><PageNavigation /><AdminApp /></>
   return <>
     <PageNavigation />
     <a className="skip-link" href="#main">Hopp til innhold</a>
@@ -46,8 +46,8 @@ export default function App() {
       <Route path="/book" element={<BookPage />} />
       <Route path="/events" element={<EventsPage />} />
       <Route path="/contact" element={<ContactPage />} />
-      <Route path="/admin" element={<AdminPage />} />
-      <Route path="/admin/login" element={<AdminPage />} />
+
+
       <Route path="*" element={<section className="page-heading"><h1>Siden finnes ikke</h1><Link to="/">Til forsiden</Link></section>} />
     </Routes></main>
     <footer className="site-footer"><div><Link className="brand" to="/">Arben Bala<span className="brand-dot">.</span></Link><p>Skuespiller og foredragsholder</p></div><div className="footer-links"><Link to="/events">Arrangementer</Link><BookingLink className="text-link" /></div><p className="footer-credit">Portrett: Are Næsset</p></footer>

@@ -15,6 +15,9 @@
     "tools:restore": "dotnet tool restore",
     "build:web": "npm --prefix frontend run build",
     "build:api": "dotnet build ActorWebsite.slnx",
-    "check": "npm run build:web && npm run build:api"
+    "check": "npm run build:web && npm run build:api",
+    "admin:create": "node --env-file=.env scripts/dotnet.mjs run --project backend/ActorWebsite.Api --no-launch-profile -- --create-admin",
+    "admin:reset-password": "node --env-file=.env scripts/dotnet.mjs run --project backend/ActorWebsite.Api --no-launch-profile -- --reset-admin-password",
+    "test:api": "node --env-file=.env scripts/test-api.mjs"
   }
 }

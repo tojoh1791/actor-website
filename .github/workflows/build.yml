@@ -21,6 +21,20 @@ jobs:
       - run: npm run build
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: actor_test
+          POSTGRES_PASSWORD: ci-only-test-password
+          POSTGRES_DB: actor_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U actor_test -d actor_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ACTOR_TEST_POSTGRES: Host=localhost;Port=5432;Database=actor_test;Username=actor_test;Password=ci-only-test-password
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -28,3 +42,5 @@ jobs:
           dotnet-version: '10.0.x'
       - run: dotnet restore ActorWebsite.slnx --locked-mode
       - run: dotnet build ActorWebsite.slnx --configuration Release --no-restore
+
+      - run: dotnet test ActorWebsite.slnx --configuration Release --no-build

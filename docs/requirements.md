@@ -56,7 +56,7 @@ The main purposes of the website are to:
 
 #### Contact 
 - Display relevant contact informasjon
-- Contact/booking request form: Planned for a future version
+- Contact/booking request form, without visitor login, with a receipt on the website
 
 
 ## Administration
@@ -67,6 +67,8 @@ The main purposes of the website are to:
 - Edit events
 - Delete events
 - Publish/unpublish events
+- Read and filter booking requests, view contact details, and maintain internal booking status
+- Delete booking requests with confirmation
 
 ## Open questions
 
@@ -86,7 +88,6 @@ The main purposes of the website are to:
 
 ## Future features
 
-- Contact/booking request form
 - Dedicated page for the book
 - Manageent of website content through the administration panel
 - Event categories
