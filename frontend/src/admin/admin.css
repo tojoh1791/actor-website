@@ -10,6 +10,11 @@ main.admin-main { width: min(100% - 40px, 760px); margin-inline: auto; padding: 
 .admin-main p { margin-bottom: 22px; }
 .admin-login, .admin-dashboard { max-width: 520px; margin-inline: auto; }
 .admin-editor { max-width: 640px; margin-inline: auto; }
+.admin-booking-source { padding: 18px; border-left: 3px solid var(--accent); background: var(--surface-soft); margin-bottom: 24px; }
+.admin-booking-source p { margin-bottom: 10px; font-size: .9rem; }
+.admin-booking-source a { display: inline-flex; align-items: center; min-height: 44px; font-size: .9rem; }
+.admin-date-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.admin-date-time .admin-field { min-width: 0; }
 .admin-stack { display: flex; flex-direction: column; gap: 14px; margin: 24px 0; }
 .admin-primary, .admin-secondary, .admin-danger { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; font: inherit; font-weight: 600; padding: 14px 18px; border: 1px solid var(--accent); border-radius: 9px; text-align: center; text-decoration: none; cursor: pointer; }
 .admin-primary { background: var(--accent); color: white; }

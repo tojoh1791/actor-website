@@ -8,6 +8,16 @@ Under /admin viser startsiden antall nye forespørsler. Innboksen på /admin/boo
 
 «Svar på e-post» åpner administratorens e-postprogram med mottaker og emne. En eventuell telefonknapp åpner ringefunksjonen. Nettsiden sender ingen e-post, kvittering eller statusmelding. Arben må følge opp gjennom innboksen og kontakte arrangøren selv. Velg status og trykk «Lagre status» for intern oversikt. «Avtalt» skal brukes etter at avtalen er bekreftet med arrangøren. Ingen status oppretter eller publiserer et offentlig arrangement.
 
+## Fra avtalt booking til arrangement
+
+Når «Avtalt» er lagret for et foredrag, en boksamtale eller annet samarbeid, vises «Opprett arrangement fra forespørselen». Skuespilleroppdrag har ikke denne muligheten. Serveren kontrollerer også oppdragstype, gjeldende status og administratortilgang når skjemaet åpnes, slik at en direkte lenke ikke omgår regelen.
+
+Knappen åpner et forhåndsutfylt skjema. Den oppretter ingen databasepost og publiserer ingenting. Forslag til tittel og offentlig beskrivelse, ønsket dato, sted og eventuell organisasjon følger med. For «Annet samarbeid» må offentlig beskrivelse skrives selv. Kontaktperson, e-post, telefon, deltakerantall og den private meldingen kopieres ikke. Manglende ønsket dato eller organisasjon gir tomme felt; kontaktpersonens navn brukes ikke som reserve for arrangørnavn. Stedsteksten beholdes i sin helhet; et stedsnavn over arrangementsskjemaets grense på 200 tegn må kortes ned før lagring.
+
+Dato og klokkeslett redigeres i separate felt, fortsatt i norsk tid. Ønsket dato er et forslag og må kontrolleres mot avtalen. Klokkeslett og gateadresse må fylles inn. Arben velger bilde, tilpasser offentlig tekst og ser forhåndsvisningen før han velger «Lagre som utkast» eller «Vis på nettsiden». «Avbryt» før lagring går tilbake til forespørselen. Skjemaet kan åpnes på nytt etter oppfriskning så lenge forespørselen fortsatt finnes og er avtalt.
+
+Et lagret arrangement administreres videre under «Mine arrangementer». Dette er forhåndsutfylling, ikke en varig kobling mellom postene: endringer i bookingstatus oppdaterer ikke arrangementet, og gjentatt oppretting kan lage flere arrangementer. Åpne derfor det eksisterende arrangementet for senere endringer. Ingen databasemigrering eller nye pakker kreves for denne funksjonen; start API-et på nytt etter oppdateringen.
+
 Sletting finnes under «Flere valg», krever bekreftelse og fjerner forespørselen fra databasen. Det finnes ingen automatisk sletterutine eller gjenoppretting i grensesnittet. Avklar hvilke opplysninger foretaket trenger å beholde, lagringstid og hvordan sikkerhetskopier håndteres før offentlig drift. Ingen fiktiv foretaksinformasjon er lagt inn; endelige firma- og kontaktopplysninger legges til når de er klare.
 
 ## Lagring og oppstart
@@ -31,6 +41,10 @@ Dette reduserer enkle spamforsøk, men verifiserer ikke avsenderens e-post og st
 ## Verifikasjon
 
 Alle 25 integrasjonstester bestod mot egne, midlertidige PostgreSQL-databaser. Testene omfatter eksisterende innlogging og arrangementsfunksjoner, samt privat og idempotent innsending, statusendringer, filtrering, sletting, avvisning uten riktig tilgang, CSRF, ugyldige felt, lokkefelt, tidsgrense og ratebegrensning. Applikasjonsdatabasen brukes ikke til testdata.
+
+Oppdateringen for forhåndsutfylling har 27 verifiserte integrasjonstester totalt. De to nye testene kontrollerer tillatte oppdragstyper, avvisning av skuespilleroppdrag og ikke-avtalte bookinger, tilgangskontroll, feltutvalg uten private kontaktopplysninger eller melding, manglende dato/organisasjon og at åpning ikke oppretter arrangementer. Ny uthenting etter endring fra «Avtalt» avvises. Testen for cachebeskyttelse kontrollerer `NoStore`-egenskapen, siden rammeverket også kan legge til `no-cache`.
+
+Separat nettlesertest bekrefter mobilvisning, skjult opprett-knapp for skuespilleroppdrag, avvisning via direkte lenke, synlig knapp først etter lagret «Avtalt», forhåndsutfylte felt etter oppfriskning, booking uten ønsket dato, lagring som privat utkast, gjenåpning med beholdt norsk tidspunkt og eksplisitt publisering uten privat melding. Vanlig manuell oppretting starter fortsatt med tomt skjema. Alle testdata lå i en separat testdatabase.
 
 Frontend og backend bygger. Ingen nye biblioteker er lagt til for bookingfunksjonen. NuGets automatiske sårbarhetssjekk var utilgjengelig i miljøet (NU1900); den kunne derfor ikke bekreftes. Migreringen er generert og kjørt med et allerede installert EF-verktøy 10.0.12 mot runtime 10.0.13. Kontrollen av ventende modellendringer bekrefter at runtime-modell og migrering samsvarer.
 

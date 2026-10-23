@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ApiError, api, eventDate } from './api'
 import { bookingDate, bookingStatuses, bookingTypes } from '../types/booking'
 import type { BookingDetails } from '../types/booking'
@@ -53,9 +53,16 @@ export default function BookingDetailsPage() {
       finally { setBusy(false) }
     }}><h2>Hold oversikt</h2><label htmlFor="booking-status">Status på forespørselen</label>
       <select id="booking-status" value={status} onChange={event => setStatus(event.target.value)} disabled={busy}>{Object.entries(bookingStatuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
-      <p className="admin-note">Bruk «Avtalt» når du og arrangøren har bekreftet avtalen. Statusen er intern og sender ingen melding. Offentlige arrangementer legger du til under «Mine arrangementer».</p>
+      <p className="admin-note">Bruk «Avtalt» når du og arrangøren har bekreftet avtalen. Statusen er intern og sender ingen melding.</p>
       <button className="admin-primary" type="submit" disabled={busy || status === item.status}>{busy ? 'Lagrer …' : 'Lagre status'}</button>
     </form>
+    {item.eventType === 'acting' ? <p className="admin-note">Skuespilleroppdrag håndteres i innboksen og kan ikke gjøres om til arrangementer.</p>
+      : item.status === 'agreed' && ['talk', 'book', 'other'].includes(item.eventType) ? <article className="admin-card">
+        <h2>Skal publikum kunne komme?</h2>
+        <p>Lag et arrangement med opplysninger fra forespørselen. Se over innholdet før du lagrer eller publiserer.</p>
+        <Link className="admin-primary" to={'/admin/events/new?booking=' + item.id}>Opprett arrangement fra forespørselen</Link>
+        <p className="admin-note">Ingenting publiseres automatisk. Private oppdrag kan bli i innboksen.</p>
+      </article> : <p className="admin-note">Når en booking er avtalt, kan du lage et offentlig arrangement her. Velg «Avtalt» og lagre statusen først.</p>}
     <details className="admin-help"><summary>Flere valg</summary><p>Slett forespørsler du ikke lenger trenger å beholde.</p><button className="admin-delete-link" onClick={() => { setError(''); setDeleting(true) }} disabled={busy}>Slett forespørselen</button></details>
     {deleting && <ConfirmDialog title="Slette forespørselen?" description="Kontaktopplysningene og meldingen slettes fra innboksen. Dette kan ikke angres. Ingen melding sendes til arrangøren." confirmLabel="Ja, slett forespørselen" busy={busy} error={error}
       onClose={() => setDeleting(false)} onConfirm={async () => {

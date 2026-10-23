@@ -28,7 +28,7 @@ function Dashboard() {
 
 function AdminRoutes() {
   const auth = useAuth()
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   const path = pathname.replace(/\/+$/, '')
   const showNavigation = auth.user && path !== '/admin' && path !== '/admin/login'
   const parent = path.startsWith('/admin/events/') ? { to: '/admin/events', label: 'Til arrangementene' }
@@ -55,7 +55,7 @@ function AdminRoutes() {
           <Route path="/admin/login" element={<LoginPage />} />
           <Route path="/admin" element={<Dashboard />} />
           <Route path="/admin/events" element={<EventList />} />
-          <Route path="/admin/events/new" element={<EventEditor key="new" />} />
+          <Route path="/admin/events/new" element={<EventEditor key={'new' + search} />} />
           <Route path="/admin/events/:id" element={<EventEditor key={pathname} />} />
           <Route path="/admin/bookings" element={<BookingInbox />} />
           <Route path="/admin/bookings/:id" element={<BookingDetailsPage key={pathname} />} />

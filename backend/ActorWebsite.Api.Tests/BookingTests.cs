@@ -82,7 +82,7 @@ public sealed class BookingTests
         var id = Guid.NewGuid();
         await Submit(client, form, Body(form, id));
         var path = "/api/admin/bookings/" + id;
-        foreach (var url in new[] { "/api/admin/bookings/", "/api/admin/bookings/summary", path })
+        foreach (var url in new[] { "/api/admin/bookings/", "/api/admin/bookings/summary", path, path + "/event-draft" })
             Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(url)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.PatchAsJsonAsync(path + "/status", new { status = "agreed" })).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.DeleteAsync(path)).StatusCode);
@@ -126,7 +126,77 @@ public sealed class BookingTests
         }
         Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/admin/bookings/")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/admin/bookings/summary")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/admin/bookings/" + Guid.NewGuid() + "/event-draft")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await AdminWrite(client, HttpMethod.Patch, "/api/admin/bookings/" + Guid.NewGuid() + "/status", new { status = "agreed" })).StatusCode);
+    }
+
+    [Fact]
+    public async Task Event_prefill_uses_public_fields_only_and_does_not_create_or_publish_anything()
+    {
+        await using var factory = new ApiFactory();
+        using var client = await factory.ReadyClientAsync();
+        var date = new DateOnly(2027, 6, 18);
+        var bookings = new[] { "talk", "book", "other" }.Select(type => new BookingRequest
+        {
+            Id = Guid.NewGuid(), ContactName = "Privat kontaktperson", Email = "private@example.test", Phone = "+47 98765432",
+            Organization = type == "other" ? null : "Kulturhuset", EventType = type, PreferredDate = type == "other" ? null : date,
+            Location = "Oslo", Message = "Privat melding med opplysninger som ikke skal publiseres.", Status = "agreed", SubmissionHash = new string('a', 64)
+        }).ToArray();
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            db.BookingRequests.AddRange(bookings);
+            await db.SaveChangesAsync();
+        }
+        await Login(client, factory);
+        foreach (var booking in bookings)
+        {
+            var response = await client.GetAsync("/api/admin/bookings/" + booking.Id + "/event-draft");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.True(response.Headers.CacheControl!.NoStore);
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal(new[] { "description", "location", "organizer", "preferredDate", "title" }, json.EnumerateObject().Select(p => p.Name).Order().ToArray());
+            Assert.Equal("Oslo", json.GetProperty("location").GetString());
+            Assert.Equal(booking.Organization, json.GetProperty("organizer").GetString());
+            Assert.Equal(booking.PreferredDate?.ToString("yyyy-MM-dd"), json.GetProperty("preferredDate").GetString());
+            Assert.Contains("Arben Bala", json.GetProperty("title").GetString());
+            var publicText = string.Join(" ", json.EnumerateObject().Select(p => p.Value.GetString()));
+            Assert.DoesNotContain(booking.ContactName, publicText);
+            Assert.DoesNotContain(booking.Email, publicText);
+            Assert.DoesNotContain(booking.Phone!, publicText);
+            Assert.DoesNotContain(booking.Message, publicText);
+        }
+        // A previously valid link must check the current status again on reload.
+        var path = "/api/admin/bookings/" + bookings[0].Id;
+        Assert.Equal(HttpStatusCode.OK, (await AdminWrite(client, HttpMethod.Patch, path + "/status", new { status = "declined" })).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await client.GetAsync(path + "/event-draft")).StatusCode);
+        await using var check = factory.Services.CreateAsyncScope();
+        Assert.Empty(await check.ServiceProvider.GetRequiredService<ApplicationDbContext>().Events.ToListAsync());
+    }
+
+    [Fact]
+    public async Task Acting_and_unconfirmed_bookings_cannot_be_used_to_prefill_events_even_with_a_direct_link()
+    {
+        await using var factory = new ApiFactory();
+        using var client = await factory.ReadyClientAsync();
+        var cases = new[] { ("acting", "agreed"), ("acting", "new"), ("talk", "new"), ("talk", "inProgress"), ("book", "declined"), ("other", "new"), ("unknown", "agreed") };
+        var bookings = cases.Select(value => new BookingRequest
+        {
+            Id = Guid.NewGuid(), ContactName = "Testperson", Email = "test@example.test", EventType = value.Item1,
+            Status = value.Item2, Location = "Oslo", Message = "En privat testforespørsel.", SubmissionHash = new string('b', 64)
+        }).ToArray();
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            db.BookingRequests.AddRange(bookings);
+            await db.SaveChangesAsync();
+        }
+        await Login(client, factory);
+        foreach (var booking in bookings)
+            Assert.Equal(HttpStatusCode.Conflict, (await client.GetAsync("/api/admin/bookings/" + booking.Id + "/event-draft")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/admin/bookings/" + Guid.NewGuid() + "/event-draft")).StatusCode);
+        await using var check = factory.Services.CreateAsyncScope();
+        Assert.Empty(await check.ServiceProvider.GetRequiredService<ApplicationDbContext>().Events.ToListAsync());
     }
 
     [Fact]

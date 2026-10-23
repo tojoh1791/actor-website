@@ -11,6 +11,9 @@ export interface BookingSummary {
 export interface BookingDetails extends BookingSummary {
   email: string; phone: string | null; participants: number | null; message: string; updatedAt: string
 }
+export interface BookingEventDraft {
+  title: string; description: string; preferredDate: string | null; location: string; organizer: string | null
+}
 export function bookingDate(value: string | null) {
   return value ? new Intl.DateTimeFormat('nb-NO', { dateStyle: 'long', timeZone: 'Europe/Oslo' })
     .format(new Date(value + 'T12:00:00Z')) : 'Dato ikke avklart'
