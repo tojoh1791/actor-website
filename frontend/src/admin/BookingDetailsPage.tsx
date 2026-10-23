@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ApiError, api, eventDate } from './api'
 import { bookingDate, bookingStatuses, bookingTypes } from '../types/booking'
 import type { BookingDetails } from '../types/booking'
@@ -26,10 +26,9 @@ export default function BookingDetailsPage() {
     return () => { active = false }
   }, [id, retry])
   if (loading) return <p role="status">Henter forespørselen …</p>
-  if (loadError || !item) return <section><h1>Forespørsel</h1><div role="alert" className="admin-error"><p>{loadError}</p><button className="admin-secondary" onClick={() => setRetry(value => value + 1)}>Prøv igjen</button></div><Link to="/admin/bookings">← Til forespørslene</Link></section>
+  if (loadError || !item) return <section><h1>Forespørsel</h1><div role="alert" className="admin-error"><p>{loadError}</p><button className="admin-secondary" onClick={() => setRetry(value => value + 1)}>Prøv igjen</button></div></section>
   const emailLink = 'mailto:' + encodeURIComponent(item.email) + '?subject=' + encodeURIComponent('Bookingforespørsel til Arben Bala – ' + bookingDate(item.preferredDate))
   return <section className="admin-booking-details">
-    <Link className="admin-back" to="/admin/bookings">← Til forespørslene</Link>
     <span className={'admin-status booking-status-' + item.status}>{bookingStatuses[item.status]}</span>
     <h1>{item.organization || item.contactName}</h1>
     <p className="admin-note">Mottatt {eventDate.format(new Date(item.createdAt))} · Referanse AB-{item.id.replaceAll('-', '').slice(0, 8).toUpperCase()}</p>

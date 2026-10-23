@@ -25,7 +25,6 @@ export default function BookingInbox() {
     return () => { active = false }
   }, [status, page, retry])
   return <section>
-    <Link className="admin-back" to="/admin">← Til oversikten</Link>
     <p className="eyebrow">Booking via nettsiden</p><h1>Forespørsler</h1>
     <p>Les henvendelser, kontakt arrangøren og hold oversikt over hva dere har avtalt.</p>
     {(location.state as { notice?: string } | null)?.notice && <p role="status" className="admin-success">{(location.state as { notice: string }).notice}</p>}

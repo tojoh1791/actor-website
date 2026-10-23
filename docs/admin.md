@@ -18,7 +18,8 @@ Lokale npm-kommandoer laster .env og er laget for utviklingsmiljøet. På en dri
 
 ## Kontrollpanelet
 
-- /admin: to hovedoppgaver, legge til arrangement og åpne arrangementsoversikten.
+- /admin: legge til arrangement, åpne forespørsler og administrere arrangementer.
+- Undersidene har en tydelig «Til oversikten»-knapp øverst. På detaljsider finnes også en lenke til arrangementslisten eller innboksen. Oversikten har ingen tilbakeknapp til seg selv.
 - /admin/events: kommende arrangementer, utkast eller alle arrangementer.
 - Nye arrangementer starter som utkast.
 - Forhåndsvisning før lagring og publisering.

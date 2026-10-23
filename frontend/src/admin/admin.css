@@ -55,7 +55,10 @@ main.admin-main { width: min(100% - 40px, 760px); margin-inline: auto; padding: 
 .admin-dialog::backdrop { background: #241b1b99; }
 .admin-dialog .admin-stack { margin-bottom: 0; }
 .admin-dialog p { overflow-wrap: anywhere; }
-.admin-back { display: inline-block; min-height: 44px; margin-bottom: 18px; text-decoration: none; }
+.admin-navigation { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 32px; }
+.admin-navigation .admin-overview-link { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 54px; padding: 12px 20px; border: 1px solid var(--accent); border-radius: 9px; background: #fff; color: var(--accent); font-size: 1rem; font-weight: 600; text-decoration: none; }
+.admin-navigation .admin-overview-link:hover { background: var(--accent); color: #fff; }
+.admin-navigation .admin-parent-link { display: inline-flex; align-items: center; min-height: 48px; color: var(--muted); text-decoration: underline; }
 .admin-description { white-space: pre-wrap; overflow-wrap: anywhere; }
 .admin-url { overflow-wrap: anywhere; }
 .admin-image-picker { border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin: 28px 0; min-width: 0; }
@@ -88,6 +91,8 @@ main.admin-main { width: min(100% - 40px, 760px); margin-inline: auto; padding: 
 .booking-status-agreed { background: #e8efdf; color: #2c4826; }
 .booking-status-declined { background: #eee9e5; color: #625853; }
 @media (max-width: 680px) {
+  .admin-navigation { align-items: stretch; flex-direction: column; gap: 4px; margin-bottom: 28px; }
+  .admin-navigation .admin-overview-link { width: 100%; }
   .admin-section-heading { align-items: flex-start; flex-direction: column; gap: 0; margin-bottom: 28px; }
   .admin-section-heading .admin-primary { max-width: none; }
   .admin-header > span { display: none; }

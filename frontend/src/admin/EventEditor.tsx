@@ -124,9 +124,8 @@ export default function EventEditor() {
       {fields[name] && <p id={'error-' + name} className="admin-field-error">{fields[name].join(' ')}</p>}</div>
   }
   if (loading) return <p role="status">Henter arrangementet …</p>
-  if (loadError) return <div role="alert" className="admin-error"><p>{loadError}</p><button className="admin-secondary" onClick={() => setRetry(retry + 1)}>Prøv igjen</button><Link to="/admin/events">Til arrangementene</Link></div>
+  if (loadError) return <div role="alert" className="admin-error"><p>{loadError}</p><button className="admin-secondary" onClick={() => setRetry(retry + 1)}>Prøv igjen</button></div>
   return <section className="admin-editor">
-    <Link className="admin-back" to="/admin/events">← Til arrangementene</Link>
     <p className="eyebrow">{preview ? 'Se gjennom før du lagrer' : current ? 'Rediger arrangement' : 'Nytt arrangement'}</p>
     <h1>{preview ? 'Ser dette riktig ut?' : current ? 'Endre arrangement' : 'Legg til arrangement'}</h1>
     {error && <div role="alert" className="admin-error"><p>{error}</p>{preview && <button type="button" className="admin-secondary" onClick={() => setPreview(false)}>Gå tilbake til feltene</button>}</div>}
