@@ -11,4 +11,3 @@ public sealed record BookingDetails(Guid Id, string ContactName, string Email, s
     public static BookingDetails From(BookingRequest b) => new(b.Id, b.ContactName, b.Email, b.Phone, b.Organization,
         b.EventType, b.PreferredDate, b.Location, b.Participants, b.Message, b.Status, b.CreatedAt, b.UpdatedAt);
 }
-

@@ -108,4 +108,3 @@ public static class BookingEndpoints
         ? Receipt(existing.Id)
         : Results.Problem(statusCode: 409, title: "En annen forespørsel er allerede mottatt med denne referansen. Last inn skjemaet på nytt før du sender en ny.");
 }
-

@@ -49,4 +49,3 @@ public static class AuthEndpoints
         }).RequireAuthorization(AdminSecurity.Policy);
     }
 }
-
