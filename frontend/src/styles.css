@@ -639,6 +639,9 @@ p {
 .page-heading h1 {
   font-size: clamp(2.8rem, 5.3vw, 4.7rem);
 }
+.events-page {
+  max-width: none;
+}
 /* Event cards: collapsed text reserves equal space; expanded cards grow independently */
 .event-list {
   display: grid;

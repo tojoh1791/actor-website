@@ -7,7 +7,7 @@ export default function EventsPage() {
   const events = data ?? []
 
   return (
-    <section className="page-heading">
+    <section className="page-heading events-page">
       <p className="eyebrow">Møt historiene</p>
       <h1>Kommende arrangementer</h1>
       <p className="lead">
